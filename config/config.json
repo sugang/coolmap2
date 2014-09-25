@@ -1,0 +1,52 @@
+{
+    "version": "1.0",
+    "R": {"R-Path": "usr/bin/R", "RScript-Path": "/usr/bin/Rscript"},
+    "plugin": {"directory": "plugin"},
+    "workspace": {"directory": "workspace"},
+    "widget": {
+        "load": [
+                    "coolmap.application.widget.impl.WidgetViewport", 
+                    "coolmap.application.widget.impl.WidgetAggregator", 
+                    "coolmap.application.widget.impl.WidgetSyncer", 
+                    "coolmap.application.widget.impl.WidgetSearch",
+                    "coolmap.application.widget.impl.WidgetCMatrix",
+                    "coolmap.application.widget.impl.ontology.WidgetCOntology",
+                    "coolmap.application.widget.impl.WidgetViewRenderer",
+                    "coolmap.application.widget.impl.WidgetDataMatrix",
+                    "coolmap.application.widget.impl.WidgetRadar",
+                    "coolmap.application.widget.impl.WidgetPointAnnotation",
+                    "coolmap.application.widget.impl.WidgetFilter",
+                    "coolmap.application.widget.impl.console.WidgetConsole"
+                 ],
+        "config": {
+            "coolmap.application.widget.impl.WidgetViewRenderer":
+                    {
+                        "load": [
+                            "coolmap.canvas.datarenderer.renderer.impl.NumberToColor",
+                            "coolmap.canvas.datarenderer.renderer.impl.NumberToLine",
+                            "coolmap.canvas.datarenderer.renderer.impl.NumberToSeries",
+                            "coolmap.canvas.datarenderer.renderer.impl.NumberToBar",
+                            "coolmap.canvas.datarenderer.renderer.impl.NumberToSortedBar",
+                            "coolmap.canvas.datarenderer.renderer.impl.NumberToBoxPlot",
+                            "coolmap.canvas.datarenderer.renderer.impl.NumberComposite"
+                            ],
+                        "preferred-location":"left-bottom"
+                    }
+        }
+    },
+    "module": {
+        "load": [ 
+            "coolmap.module.impl.ClusterModule",
+            "coolmap.module.impl.SideMapModule",
+            "coolmap.module.impl.QuickStatModule"
+            ],
+        "config": {
+            "coolmap.module.impl.SideMapModule":{
+                "load": {
+                    "row" : ["coolmap.canvas.sidemaps.impl.RowLabels","coolmap.canvas.sidemaps.impl.RowTree"],
+                    "column" : ["coolmap.canvas.sidemaps.impl.ColumnLabels","coolmap.canvas.sidemaps.impl.ColumnTree"]
+                }
+            }
+        }
+    }
+}
