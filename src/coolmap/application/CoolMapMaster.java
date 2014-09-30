@@ -135,7 +135,7 @@ public final class CoolMapMaster {
             
         }
         
-        
+        // Load configs from file, such as the directories of plugins and modules
         Config.initialize();
         
         //

@@ -1,0 +1,127 @@
+LINE1_Site1.Met...._C	Line 1 methylation Child
+LINE1_Site2.Met...._C	Line 1 methylation Child
+LINE1_Site3.Met...._C	Line 1 methylation Child
+LINE1_Site4.Met...._C	Line 1 methylation Child
+ESR1_Site1.Met...._C	ESR Methylation Child
+ESR1_Site2.Met...._C	ESR Methylation Child
+ESR1_Site3.Met...._C	ESR Methylation Child
+IGF2_Site1.Met...._C	IGF2 Methylation Child
+IGF2_Site2.Met...._C	IGF2 Methylation Child
+IGF2_Site3.Met...._C	IGF2 Methylation Child
+PPARa_Site1.Met...._C	PPARa Methylation Child
+PPARa_Site2.Met...._C	PPARa Methylation Child
+PPARa_Site3.Met...._C	PPARa Methylation Child
+C3_C	BCAA AcylCarnitines Child
+C4_C	BCAA AcylCarnitines Child
+C5.0_C	BCAA AcylCarnitines Child
+C8.0_C	MediumChain Acyl Carnitines Child
+C6.0_C	MediumChain Acyl Carnitines Child
+C8.1_C	MediumChain Acyl Carnitines Child
+C10.0_C	MediumChain Acyl Carnitines Child
+C10.1_C	MediumChain Acyl Carnitines Child
+C12.0_C	MediumChain Acyl Carnitines Child
+C12.1_C	MediumChain Acyl Carnitines Child
+C12.OH_C	MediumChain Acyl Carnitines Child
+C14.0_C	Long Chain AcylCarnitines Child
+C16.0_C	Long Chain AcylCarnitines Child
+C5.0.DC_C	Long Chain AcylCarnitines Child
+C14.1_C	Long Chain AcylCarnitines Child
+C14.2_C	Long Chain AcylCarnitines Child
+C14.OH_C	Long Chain AcylCarnitines Child
+C16.1_C	Long Chain AcylCarnitines Child
+C16.OH_C	Long Chain AcylCarnitines Child
+C18.0_C	Long Chain AcylCarnitines Child
+C18.1_C	Long Chain AcylCarnitines Child
+C18.2_C	Long Chain AcylCarnitines Child
+C18.2.OH_C	Long Chain AcylCarnitines Child
+Valine_C	BCAA Child
+Leucine_C	BCAA Child
+Isoleucine_C	BCAA Child
+Phenylalanine_C	Aromatic Amino Acids Child
+Tryptophan_C	Aromatic Amino Acids Child
+Tyrosine_C	Aromatic Amino Acids Child
+X16.0_C	Saturated Fatty Acids Child
+X18.0_C	Saturated Fatty Acids Child
+X20.0_C	Saturated Fatty Acids Child
+X22.0_C	Saturated Fatty Acids Child
+X24.0_C	Saturated Fatty Acids Child
+X16.1_C	Monounsaturated Fatty Acids Child
+X18.1..n.7._C	Monounsaturated Fatty Acids Child
+X18.1..n.9._C	Monounsaturated Fatty Acids Child
+X20.1_C	Monounsaturated Fatty Acids Child
+X22.1_C	Monounsaturated Fatty Acids Child
+X24.1_C	Monounsaturated Fatty Acids Child
+X18.2_C	PUFA Child
+X18.3..n.3._C	PUFA Child
+X18.3..n.6._C	PUFA Child
+X20.2_C	PUFA Child
+X20.3_C	PUFA Child
+X20.4_C	PUFA Child
+X20.5_C	PUFA Child
+X22.4_C	PUFA Child
+X22.5_C	PUFA Child
+X22.6_C	PUFA Child
+LINE1_Site1.Met...._M	Line 1 methylation Mother
+LINE1_Site2.Met...._M	Line 1 methylation Mother
+LINE1_Site3.Met...._M	Line 1 methylation Mother
+LINE1_Site4.Met...._M	Line 1 methylation Mother
+ESR1_Site1.Met...._M	ESR Methylation Mother
+ESR1_Site2.Met...._M	ESR Methylation Mother
+ESR1_Site3.Met...._M	ESR Methylation Mother
+IGF2_Site1.Met...._M	IGF2 Methylation Mother
+IGF2_Site2.Met...._M	IGF2 Methylation Mother
+IGF2_Site3.Met...._M	IGF2 Methylation Mother
+PPARa_Site1.Met...._M	PPARa Methylation Mother
+PPARa_Site2.Met...._M	PPARa Methylation Mother
+PPARa_Site3.Met...._M	PPARa Methylation Mother
+C3_M	BCAA AcylCarnitines Mother
+C4_M	BCAA AcylCarnitines Mother
+C5.0_M	BCAA AcylCarnitines Mother
+C5.0.DC_M	MediumChain Acyl Carnitines Mother
+C6.0_M	MediumChain Acyl Carnitines Mother
+C8.0_M	MediumChain Acyl Carnitines Mother
+C8.1_M	MediumChain Acyl Carnitines Mother
+C10.0_M	MediumChain Acyl Carnitines Mother
+C10.1_M	MediumChain Acyl Carnitines Mother
+C12.0_M	MediumChain Acyl Carnitines Mother
+C12.1_M	MediumChain Acyl Carnitines Mother
+C12.OH_M	Long Chain AcylCarnitines Mother
+C14.0_M	Long Chain AcylCarnitines Mother
+C14.2_M	Long Chain AcylCarnitines Mother
+C14.OH_M	Long Chain AcylCarnitines Mother
+C16.0_M	Long Chain AcylCarnitines Mother
+C18.0_M	Long Chain AcylCarnitines Mother
+C14.1_M	Long Chain AcylCarnitines Mother
+C16.1_M	Long Chain AcylCarnitines Mother
+C16.OH_M	Long Chain AcylCarnitines Mother
+C18.1_M	Long Chain AcylCarnitines Mother
+C18.2_M	Long Chain AcylCarnitines Mother
+C18.2.OH_M	Long Chain AcylCarnitines Mother
+Valine_M	BCAA Mother
+Leucine_M	BCAA Mother
+Isoleucine_M	BCAA Mother
+Phenylalanine_M	Aromatic Amino Acids Mother
+Tyrosine_M	Aromatic Amino Acids Mother
+Tryptophan_M	Aromatic Amino Acids Mother
+X14.0_M	Saturated Fatty Acids Mother
+X16.0_M	Saturated Fatty Acids Mother
+X18.0_M	Saturated Fatty Acids Mother
+X20.0_M	Saturated Fatty Acids Mother
+X22.0_M	Saturated Fatty Acids Mother
+X24.0_M	Saturated Fatty Acids Mother
+X16.1_M	Monounsaturated Fatty Acids Mother
+X18.1..n.7._M	Monounsaturated Fatty Acids Mother
+X18.1..n.9._M	Monounsaturated Fatty Acids Mother
+X20.1_M	Monounsaturated Fatty Acids Mother
+X22.1_M	Monounsaturated Fatty Acids Mother
+X24.1_M	Monounsaturated Fatty Acids Mother
+X18.2_M	PUFA Mother
+X18.3..n.3._M	PUFA Mother
+X18.3..n.6._M	PUFA Mother
+X20.2_M	PUFA Mother
+X20.3_M	PUFA Mother
+X20.4_M	PUFA Mother
+X20.5_M	PUFA Mother
+X22.4_M	PUFA Mother
+X22.5_M	PUFA Mother
+X22.6_M	PUFA Mother

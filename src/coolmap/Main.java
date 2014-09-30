@@ -38,6 +38,10 @@ import rcaller.RCode;
  * @author gangsu
  */
 public class Main {
+    
+    public static final String corFilePath = "/Users/keqiangli/NetBeansProjects/CoolMap/data/0correlation.txt";
+    public static final String chiParFilePath = "/Users/keqiangli/NetBeansProjects/CoolMap/data/0Child_Parent.txt";
+    public static final String chiParFileCopyPath = "/Users/keqiangli/NetBeansProjects/CoolMap/data/0Child_Parent copy.txt";
 
     public static void main(String args[]) {
 
@@ -93,17 +97,17 @@ public class Main {
             //import sample
             //CMatrix matrix = ImportDoubleCMatrixFromFile.importFromFile(new File("/Users/gangsu/Dropbox/Research - Dropbox/TBC 2013/eisenFinal.txt"));
 // /Users/sugang/Dropbox/Research - Dropbox/CoolMap datasets/0ClusteringTest.txt
-//            "/Users/sugang/Dropbox/Research - Dropbox/CoolMap datasets/0correlation.txt"
+//            corFilePath
 //            CMatrix matrix = ImportDoubleCMatrixFromFile.importFromFile(new File("/Users/sugang/Dropbox/Research - Dropbox/CoolMap datasets/0ClusteringTest.txt"));
 //            CMatrix matrix = ImportDoubleCMatrixFromFile.importFromFile(new File("/Users/sugang/Dropbox/Research - Dropbox/CoolMap datasets/eisenFinal.txt"));
 
-            CMatrix matrix = ImportDoubleCMatrixFromFile.importFromFile(new File("/Users/sugang/Dropbox/Research - Dropbox/CoolMap datasets/0correlation.txt"));
+            CMatrix matrix = ImportDoubleCMatrixFromFile.importFromFile(new File(corFilePath));
 //            System.out.println(matrix + " " + matrix.getNumRows() + " " + matrix.getNumColumns() + " " + matrix.getValue(0, 0));
 
             object = new CoolMapObject();
             object.addBaseCMatrix(matrix);
 
-            CMatrix matrix2 = ImportDoubleCMatrixFromFile.importFromFile(new File("/Users/sugang/Dropbox/Research - Dropbox/CoolMap datasets/0correlation.txt"));
+            CMatrix matrix2 = ImportDoubleCMatrixFromFile.importFromFile(new File(corFilePath));
 //            object.addBaseCMatrix(matrix2);
 
 //            Add base nodes ===================================================
@@ -149,10 +153,10 @@ public class Main {
 //            for(int i=0; i<100; i++){
 //                COntology.setAttribute("Node2", "Weight"+i, "Attr");
 //            }
-            onto = ImportCOntologyFromSimpleTwoColumn.importFromFile(new File("/Users/sugang/Dropbox/Research - Dropbox/CoolMap datasets/0Child_Parent.txt"));
+            onto = ImportCOntologyFromSimpleTwoColumn.importFromFile(new File(chiParFilePath));
             CoolMapMaster.addNewCOntology(onto);
 
-            onto = ImportCOntologyFromSimpleTwoColumn.importFromFile(new File("/Users/sugang/Dropbox/Research - Dropbox/CoolMap datasets/0Child_Parent copy.txt"));
+            onto = ImportCOntologyFromSimpleTwoColumn.importFromFile(new File(chiParFileCopyPath));
             CoolMapMaster.addNewCOntology(onto);
 
             object.insertRowNodes(onto.getRootNodesOrdered());
@@ -228,7 +232,7 @@ public class Main {
                 COntology onto;
 
                 if (true) {
-                    CMatrix matrix = ImportDoubleCMatrixFromFile.importFromFile(new File("/Users/sugang/Dropbox/Research - Dropbox/CoolMap datasets/0correlation.txt"));
+                    CMatrix matrix = ImportDoubleCMatrixFromFile.importFromFile(new File(corFilePath));
 
                     //import sample
                     //CMatrix matrix = ImportDoubleCMatrixFromFile.importFromFile(new File("/Users/gangsu/Dropbox/Research - Dropbox/TBC 2013/eisenFinal.txt"));
@@ -258,7 +262,7 @@ public class Main {
                     object.getCoolMapView().addColumnMap(new ColumnTree(object));
                     CoolMapMaster.addNewBaseMatrix(matrix);
                     CoolMapMaster.addNewCoolMapObject(object);
-                    onto = ImportCOntologyFromSimpleTwoColumn.importFromFile(new File("/Users/sugang/Dropbox/Research - Dropbox/CoolMap datasets/0Child_Parent.txt"));
+                    onto = ImportCOntologyFromSimpleTwoColumn.importFromFile(new File(chiParFilePath));
                     CoolMapMaster.addNewCOntology(onto);
                 }
 
