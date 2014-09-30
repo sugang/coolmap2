@@ -396,7 +396,7 @@ public class Main {
                         String coolMapPath = System.getProperty("user.dir");
 
                         try {
-                            File file = new File(coolMapPath + File.separator + "config.json");
+                            File file = new File(coolMapPath + File.separator + "config" + File.separator + "config.json");
 //                            file = new File(file.getParentFile() + File.separator + "rconfig.json");
                             BufferedReader reader = new BufferedReader(new FileReader(file));
                             StringBuffer sb = new StringBuffer();

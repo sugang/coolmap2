@@ -55,7 +55,7 @@ public class Config {
                 if (workingDirectory.endsWith("/") || workingDirectory.endsWith("\\")) {
                     workingDirectory = workingDirectory.substring(0, workingDirectory.length() - 1); //strip last separator
                 }
-                configFile = workingDirectory + File.separator + "config.json";
+                configFile = workingDirectory + File.separator + "config" + File.separator + "config.json";
                 configHash.put(COOLMAP_DIRECTORY, workingDirectory);
             }
             else{
