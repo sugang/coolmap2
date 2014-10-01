@@ -183,12 +183,12 @@ public class Main {
 
             object.setSnippetConverter(new DoubleSnippet1_3());
 
-//            object.setSnippetConverter(SnippetMaster.getConverter("D13"));//
+//          object.setSnippetConverter(SnippetMaster.getConverter("D13"));//
             object.getCoolMapView().addRowMap(new RowLabels(object));
             object.getCoolMapView().addRowMap(new RowTree(object));
             object.getCoolMapView().addColumnMap(new ColumnLabels(object));
             object.getCoolMapView().addColumnMap(new ColumnTree(object));
-//            object.getCoolMapView().addColumnMap(new ColumnTree(object));
+//          object.getCoolMapView().addColumnMap(new ColumnTree(object));
             
             
             
