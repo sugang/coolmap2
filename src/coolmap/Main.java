@@ -38,10 +38,11 @@ import rcaller.RCode;
  * @author gangsu
  */
 public class Main {
-    
-    public static final String corFilePath = "/Users/keqiangli/NetBeansProjects/CoolMap/data/0correlation.txt";
-    public static final String chiParFilePath = "/Users/keqiangli/NetBeansProjects/CoolMap/data/0Child_Parent.txt";
-    public static final String chiParFileCopyPath = "/Users/keqiangli/NetBeansProjects/CoolMap/data/0Child_Parent copy.txt";
+   
+    public static final String coolMapPath = System.getProperty("user.dir");
+    public static final String corFilePath = coolMapPath + File.separator + "data" + File.separator + "0correlation.txt";
+    public static final String chiParFilePath = coolMapPath + File.separator + "data" + File.separator + "0Child_Parent.txt";
+    public static final String chiParFileCopyPath = coolMapPath + File.separator + "data" + File.separator + "0Child_Parent copy.txt";
 
     public static void main(String args[]) {
 
@@ -393,7 +394,7 @@ public class Main {
                         //not quite right
 //                        System.out.println("Running path:" + decodedPath);
 //                        Try to load R
-                        String coolMapPath = System.getProperty("user.dir");
+                       
 
                         try {
                             File file = new File(coolMapPath + File.separator + "config" + File.separator + "config.json");
