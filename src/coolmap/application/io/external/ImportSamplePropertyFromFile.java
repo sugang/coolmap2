@@ -84,7 +84,7 @@ public class ImportSamplePropertyFromFile {
         
         CSamplePropertyMatrix samplePropertyMatrix = new CSamplePropertyMatrix(file.getPath(), propValuesForEachSample, sampleNames, propOrder, propUniqValues);
         
-        samplePropertyMatrix.movePropertyToIndex(3, 1);
+        samplePropertyMatrix.movePropertyToIndex(2, 0);
         
         return samplePropertyMatrix.getOntology();
     }
