@@ -8,6 +8,7 @@ import coolmap.application.CoolMapMaster;
 import coolmap.application.io.actions.ImportCOntologyGMTAction;
 import coolmap.application.io.actions.ImportCOntologySIFAction;
 import coolmap.application.io.actions.ImportDataTSVAction;
+import coolmap.application.io.actions.ImportSamplePropertyTableAction;
 import coolmap.application.io.internal.cmatrix.ICMatrixIO;
 import coolmap.application.io.internal.contology.PrivateCOntologyStructureFileIO;
 import coolmap.application.io.internal.coolmapobject.PrivateCoolMapObjectIO;
@@ -379,6 +380,15 @@ public class IOMaster {
         menuItem = new MenuItem("GSEA gmt");
         CoolMapMaster.getCMainFrame().addMenuItem("File/Import ontology", menuItem, false, false);
         menuItem.addActionListener(new ImportCOntologyGMTAction());
+        
+        /*
+        * edited by Keqiang Li
+        * This menu item is used to import sample and property table file used to generate the ontology
+        */
+        
+        menuItem = new MenuItem("Sample-property table file");
+        CoolMapMaster.getCMainFrame().addMenuItem("File/Import ontology", menuItem, false, false);
+        menuItem.addActionListener(new ImportSamplePropertyTableAction());
 
 
         menuItem = new MenuItem("view to TSV file");

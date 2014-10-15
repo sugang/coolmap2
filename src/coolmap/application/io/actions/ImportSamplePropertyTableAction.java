@@ -6,7 +6,7 @@
 package coolmap.application.io.actions;
 
 import coolmap.application.CoolMapMaster;
-import coolmap.application.io.external.ImportCOntologyFromSimpleTwoColumn;
+import coolmap.application.io.external.ImportSamplePropertyFromFile;
 import coolmap.application.utils.LongTask;
 import coolmap.application.utils.TaskEngine;
 import coolmap.application.widget.impl.console.CMConsole;
@@ -20,13 +20,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
- * @author sugang
+ * @author Keqiang Li
  */
-public class ImportCOntologySIFAction extends AbstractAction {
-
-    public ImportCOntologySIFAction() {
-        super("from sif(two column)");
-        putValue(SHORT_DESCRIPTION, "import ontology from sif (two column file, 'child parent') ");
+public class ImportSamplePropertyTableAction extends AbstractAction {
+    
+    public ImportSamplePropertyTableAction() {
+        super("from sample-property table file");
+        putValue(javax.swing.AbstractAction.SHORT_DESCRIPTION, "import sample-property table file, and then generate ontology on it");
     }
 
     @Override
@@ -40,21 +40,21 @@ public class ImportCOntologySIFAction extends AbstractAction {
         final File f = chooser.getSelectedFile();
         if (f != null && f.isFile() && f.exists()) {
 
-            LongTask task = new LongTask("import ontology...") {
+            LongTask task = new LongTask("import sample property file...") {
 
                 @Override
                 public void run() {
                     try {
-                        COntology ontology = ImportCOntologyFromSimpleTwoColumn.importFromFile(f);                 
+                        COntology ontology = ImportSamplePropertyFromFile.importSamplePropertyFromFile(f);
                         if(ontology == null)
                             return;
-
+                        
                         ontology.setName(Tools.removeFileExtension(f.getName()));
                         CoolMapMaster.addNewCOntology(ontology);
-
-                        CMConsole.logInSuccess("Ontology imported from " + f.getPath());
+                       
+                        CMConsole.logInSuccess("File imported sample property file and ontology generated " + f.getPath());
                     } catch (Exception ex) {
-                        CMConsole.logError("Error: failed to import ontology from " + f.getName());
+                        CMConsole.logError("Error: failed to import sample-property file from " + f.getName());
                     }
                 }
             };
@@ -65,5 +65,5 @@ public class ImportCOntologySIFAction extends AbstractAction {
         
         
     }
-
+    
 }
