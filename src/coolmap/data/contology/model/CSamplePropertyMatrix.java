@@ -6,6 +6,7 @@
 package coolmap.data.contology.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
@@ -113,7 +114,7 @@ public class CSamplePropertyMatrix {
         String ontologyName = _propOrder.toString();
         _ontology = new COntology(ontologyName, "default ontology generated on properties");
 
-        _depthFirstBuildOntology("fakeRoot", 0);
+        _depthFirstBuildOntology("Root", 0);
         _mapSamplesToOntology();
 
         _ontology.validate();
@@ -144,6 +145,119 @@ public class CSamplePropertyMatrix {
             }
 
             _ontology.addRelationshipNoUpdateDepth(prefix, prefix + "-" + _sampleNames.get(i));
+        }
+    }
+    
+    // user customized property group. users may group values from 1 to 100 as group "1-100"
+    private abstract class SamplePropertyGroup <T> {
+        public String customizedName;
+        
+        public SamplePropertyGroup(String name) {
+            customizedName = name;
+        }
+        
+        public abstract boolean contains(T value);
+    }
+    
+    private class ContinuousSamplePropertyGroup extends SamplePropertyGroup <Double> {
+        private double _min;
+        private double _max;
+        
+        public ContinuousSamplePropertyGroup (String name, double min, double max) {
+            super(name);
+            this._min = min;
+            this._max = max;
+        }
+        
+        public boolean setMin(double min) {
+            if (min <= _max) {
+                _min = min;
+                return true;
+            }
+            return false;
+        }
+        
+        public boolean setMax(double max) {
+            if (max >= _min) {
+                _max = max;
+                return true;
+            }
+            return false;
+        }
+        
+        @Override
+        public boolean contains (Double value) {
+            return value >= _min && value <= _max;
+        }
+    }
+
+    private class CategorizedSamplePropertyGroup extends SamplePropertyGroup <String> {
+        private HashSet<String> _group;
+        
+        public CategorizedSamplePropertyGroup(String name) {
+            super(name);
+            _group = new HashSet<>();
+        }
+        
+        public void addValue(String value) {
+            _group.add(value);
+        }
+        
+        public void removeValue (String value) {
+            if (_group.contains(value)) {
+                _group.remove(value);
+            }
+        }
+        
+        @Override
+        public boolean contains(String value) {
+            return _group.contains(value);
+        }
+        
+    }
+    
+    private abstract class SampleProperty <T> {
+        public String type; // type of this property, such as the type of MALE is GENDER
+        private SamplePropertyGroup<T> _group;
+        public T value;
+
+        public SampleProperty(String type, T value) {
+            this.type = type;
+            this.value = value;
+        }
+        
+        public void setGroup (SamplePropertyGroup group) {
+            _group = group;
+        }
+        
+        public String getDisplayName() {
+            if (_group != null) {
+                return _group.customizedName;
+            }
+            return getDisplayName();
+        }
+
+        public abstract String getDisplayValue();
+    }
+    
+    private class CategorizedSampleProperty extends SampleProperty<String> {
+        public CategorizedSampleProperty(String type, String value) {
+            super(type, value);
+        }
+        
+        public String getDisplayValue() {
+            return value;
+        }
+    }
+
+    private class ContinuousSampleProperty extends SampleProperty<Double> {
+
+        public ContinuousSampleProperty(String type, double value) {
+            super(type, value);
+        }
+
+        public String getDisplayValue() {
+            return "" + value;
         }
     }
 }
