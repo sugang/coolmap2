@@ -23,6 +23,8 @@ public class CSamplePropertyMatrix {
     // continurity of the property
     public static final String PROPERTY_CONTINUITY_CONTINUOUS = "con";
     public static final String PROPERTY_CONTINUITY_CATEGORIZED = "cat";
+    
+    public static final int NUMBER_LIMIT_OF_UNIQUE_CONTINUOUS_VALUE = 10;
     // each sample-property table will be named as the imported file's name
     public final String name;
     // use the property name as key, each entry contains what this property value is for each sample
@@ -66,6 +68,10 @@ public class CSamplePropertyMatrix {
                         groupList.add(tmpGroup);
                     }   break;
                 case PROPERTY_CONTINUITY_CONTINUOUS:
+                    if (_propUniqValues.get(type).size() > NUMBER_LIMIT_OF_UNIQUE_CONTINUOUS_VALUE) {
+                        groupList = _fakeDefaultGroup(type);
+                        break;
+                    }
                     for (String value : _propUniqValues.get(type)) {
                         SamplePropertyGroup<Double> tmpGroup = new ContinuousSamplePropertyGroup("" + value, Double.parseDouble(value), Double.parseDouble(value));
                         groupList.add(tmpGroup);
@@ -78,6 +84,40 @@ public class CSamplePropertyMatrix {
         }
     }
 
+    // function to generate group
+    private ArrayList _fakeDefaultGroup(String propType) {
+        ArrayList<SamplePropertyGroup<Double>> result = new ArrayList<>();
+        
+        if (_propUniqValues.get(propType).size() <= 0) {
+            return result;
+        }
+        
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+        
+        for (String value : _propUniqValues.get(propType)) {
+            double curValue = Double.parseDouble(value);
+            if (curValue < min) {
+                min = curValue;
+            }
+            if (curValue >= max) {
+                max = curValue;
+            }
+        }
+        
+        min = Math.floor(min);
+        max = Math.ceil(max);
+        
+        long increment = (int) Math.ceil((max - min) / NUMBER_LIMIT_OF_UNIQUE_CONTINUOUS_VALUE);
+        long curMin = (long)min;
+        for (int i = 0; i < 10; ++i) {
+            long curMax = curMin + increment;
+            result.add(new ContinuousSamplePropertyGroup("(" + curMin + ", " + curMax + "]", curMin, curMax));
+            curMin = curMax;
+        }
+        
+        return result;
+    }
     public ArrayList<String> getSampleNames() {
         return _sampleNames;
     }
