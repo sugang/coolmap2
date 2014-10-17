@@ -5,7 +5,9 @@
  */
 package coolmap.data.contology.model;
 
+import coolmap.application.widget.impl.console.CMConsole;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -18,29 +20,62 @@ import java.util.LinkedHashSet;
  */
 public class CSamplePropertyMatrix {
 
+    // continurity of the property
+    public static final String PROPERTY_CONTINUITY_CONTINUOUS = "con";
+    public static final String PROPERTY_CONTINUITY_CATEGORIZED = "cat";
     // each sample-property table will be named as the imported file's name
     public final String name;
-
     // use the property name as key, each entry contains what this property value is for each sample
     private final LinkedHashMap<String, ArrayList<String>> _propValuesForEachSample;
     // names of samples, mainly used for displaying
     private final ArrayList<String> _sampleNames;
     // current order of the properties
     private final ArrayList<String> _propOrder;
+    // whether the property is continuous or categorized
+    private final HashMap<String, String> _propertyContinuity;
     // reflected ontology of the current property order
     private COntology _ontology;
     // propUniqValues are the unique property values a property could have, property name as the key
     private final LinkedHashMap<String, LinkedHashSet<String>> _propUniqValues;
+    // the grouping information for a certain type of property.
+    private LinkedHashMap<String, ArrayList<SamplePropertyGroup> > _propertyGroupInfo;
 
     public CSamplePropertyMatrix(String name, LinkedHashMap propValuesForEachSample,
-            ArrayList sampleNames, ArrayList propOrder, LinkedHashMap propUniqValues) {
+            ArrayList sampleNames, ArrayList propOrder, LinkedHashMap propUniqValues, HashMap propertyContinuity) {
         this.name = name;
         this._propValuesForEachSample = propValuesForEachSample;
         this._sampleNames = sampleNames;
         this._propOrder = propOrder;
         this._propUniqValues = propUniqValues;
+        this._propertyContinuity = propertyContinuity;
+        
+        _initializeDefaultPropertyGroupInfo();
         // generate ontology based on property order
         _reGenerateOntology();
+    }
+    
+    // user has not specify any group information, instead, every group contains 1 single value
+    private void _initializeDefaultPropertyGroupInfo() {
+        _propertyGroupInfo = new LinkedHashMap ();
+        for (String type : _propOrder) {
+            ArrayList<SamplePropertyGroup> groupList = new ArrayList<>();
+            switch (_propertyContinuity.get(type)) {
+                case PROPERTY_CONTINUITY_CATEGORIZED:
+                    for (String value : _propUniqValues.get(type)) {
+                        SamplePropertyGroup<String> tmpGroup = new CategorizedSamplePropertyGroup(value);
+                        groupList.add(tmpGroup);
+                    }   break;
+                case PROPERTY_CONTINUITY_CONTINUOUS:
+                    for (String value : _propUniqValues.get(type)) {
+                        SamplePropertyGroup<Double> tmpGroup = new ContinuousSamplePropertyGroup("" + value, Double.parseDouble(value), Double.parseDouble(value));
+                        groupList.add(tmpGroup);
+                    }   break;
+                default:
+                    CMConsole.logError("invalid property continuity value");
+                    continue;
+            }
+            _propertyGroupInfo.put(type, groupList);
+        }
     }
 
     public ArrayList<String> getSampleNames() {
@@ -216,7 +251,7 @@ public class CSamplePropertyMatrix {
         
     }
     
-    private abstract class SampleProperty <T> {
+    public abstract class SampleProperty <T> {
         public String type; // type of this property, such as the type of MALE is GENDER
         private SamplePropertyGroup<T> _group;
         public T value;
@@ -240,7 +275,7 @@ public class CSamplePropertyMatrix {
         public abstract String getDisplayValue();
     }
     
-    private class CategorizedSampleProperty extends SampleProperty<String> {
+    public class CategorizedSampleProperty extends SampleProperty<String> {
         public CategorizedSampleProperty(String type, String value) {
             super(type, value);
         }
@@ -250,7 +285,7 @@ public class CSamplePropertyMatrix {
         }
     }
 
-    private class ContinuousSampleProperty extends SampleProperty<Double> {
+    public class ContinuousSampleProperty extends SampleProperty<Double> {
 
         public ContinuousSampleProperty(String type, double value) {
             super(type, value);

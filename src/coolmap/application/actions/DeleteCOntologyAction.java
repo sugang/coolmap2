@@ -11,7 +11,6 @@ import coolmap.utils.graphics.UI;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
-import quicktime.util.QTUtils;
 
 /**
  *

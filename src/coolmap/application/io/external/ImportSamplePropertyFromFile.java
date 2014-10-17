@@ -12,8 +12,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  *
@@ -25,10 +27,17 @@ public class ImportSamplePropertyFromFile {
         BufferedReader reader = new BufferedReader(new FileReader(file));
         String line;
         ArrayList<String> propOrder = new ArrayList<>();
+        HashMap<String, String> contunuity = new HashMap<>();
         if ((line = reader.readLine()) != null) {
             try {
-                propOrder.addAll(Arrays.asList(line.split("\t", -1)));
-                propOrder.remove(0);
+                List<String> props = new ArrayList(Arrays.asList(line.split("\t", -1)));
+                props.remove(0);
+                for (String prop : props) {
+                    int index = prop.indexOf('/');
+                    String propertyType = prop.substring(0, index);
+                    propOrder.add(propertyType);
+                    contunuity.put(propertyType, prop.substring(index + 1));
+                }
                 // doesn't have any properties
                 if (propOrder.size() < 1) {
                     return null;
@@ -82,9 +91,7 @@ public class ImportSamplePropertyFromFile {
         }
         reader.close();
         
-        CSamplePropertyMatrix samplePropertyMatrix = new CSamplePropertyMatrix(file.getPath(), propValuesForEachSample, sampleNames, propOrder, propUniqValues);
-        
-        samplePropertyMatrix.movePropertyToIndex(2, 0);
+        CSamplePropertyMatrix samplePropertyMatrix = new CSamplePropertyMatrix(file.getPath(), propValuesForEachSample, sampleNames, propOrder, propUniqValues, contunuity);
         
         return samplePropertyMatrix.getOntology();
     }
