@@ -26,51 +26,60 @@ public class CSamplePropertyMatrix {
 
     public static final int NUMBER_LIMIT_OF_UNIQUE_CONTINUOUS_VALUE = 10;
     // each sample-property table will be named as the imported file's name
-    public final String name;
+    public final String matrixName;
     // use the property name as key, each entry contains what this property value is for each sample
-    private final LinkedHashMap<String, ArrayList<String>> _propValuesForEachSample;
+    private final LinkedHashMap<String, ArrayList<String>> _propNameToPropStrings;
     // names of samples, mainly used for displaying
     private final ArrayList<String> _sampleNames;
     // current order of the properties
     private final ArrayList<String> _propOrder;
     // whether the property is continuous or categorized
-    private final HashMap<String, String> _propertyContinuity;
+    private final HashMap<String, String> _propContinuity;
     // reflected ontology of the current property order
     private COntology _ontology;
     // propUniqValues are the unique property values a property could have, property name as the key
     private final LinkedHashMap<String, LinkedHashSet<String>> _propUniqValues;
     // the grouping information for a certain type of property.
-    private LinkedHashMap<String, ArrayList<SamplePropertyGroup>> _propertyGroupInfo;
+    private LinkedHashMap<String, ArrayList<SamplePropertyGroup>> _propCroupInfo;
     // all properties objects
-    private LinkedHashMap<String, ArrayList<SampleProperty>> _sampleProperties;
+    private LinkedHashMap<String, ArrayList<SampleProperty>> _propNameToProperties;
     // all properties objects using sample name as key
     private LinkedHashMap<String, ArrayList<SampleProperty>> _sampleNameToProperties;
 
-    public CSamplePropertyMatrix(String name, LinkedHashMap propValuesForEachSample,
-            ArrayList sampleNames, ArrayList propOrder, LinkedHashMap propUniqValues, HashMap propertyContinuity) {
-        this.name = name;
-        this._propValuesForEachSample = propValuesForEachSample;
+    public CSamplePropertyMatrix(String matrixName, LinkedHashMap propNameToProps,
+            ArrayList sampleNames, ArrayList propOrder, LinkedHashMap propUniqValues, HashMap propContinuity) {
+        this.matrixName = matrixName;
+        this._propNameToPropStrings = propNameToProps;
         this._sampleNames = sampleNames;
         this._propOrder = propOrder;
         this._propUniqValues = propUniqValues;
-        this._propertyContinuity = propertyContinuity;
-
-        // generate default property group
+        this._propContinuity = propContinuity;
+        
+        /* generate default property group, default groups will be generated only
+           once when the data be read from the files */
         _initializeDefaultPropertyGroupInfo();
         // using the passed-in arguments to generate group information and other info
         _generateProps();
-        // organize the groups of properties
+        // assign group to each input property
         _organizeGroup();
+
+        _setUp();
+    }
+    
+    // configurations need to be done each time properties are reordered
+    private void _setUp() {
+        // relink properties
+        _linkProperties();
         // generate ontology based on property order
         _reGenerateOntology();
     }
     
     // user has not specify any group information, instead, every group contains 1 single value
     private void _initializeDefaultPropertyGroupInfo() {
-        _propertyGroupInfo = new LinkedHashMap();
+        _propCroupInfo = new LinkedHashMap();
         for (String propType : _propOrder) {
             ArrayList<SamplePropertyGroup> groupList = new ArrayList<>();
-            switch (_propertyContinuity.get(propType)) {
+            switch (_propContinuity.get(propType)) {
                 case PROPERTY_CONTINUITY_CATEGORIZED:
                     for (String value : _propUniqValues.get(propType)) {
                         CategorizedSamplePropertyGroup tmpGroup = new CategorizedSamplePropertyGroup(value);
@@ -80,7 +89,7 @@ public class CSamplePropertyMatrix {
                     break;
                 case PROPERTY_CONTINUITY_CONTINUOUS:
                     if (_propUniqValues.get(propType).size() > NUMBER_LIMIT_OF_UNIQUE_CONTINUOUS_VALUE) {
-                        groupList = _fakeDefaultGroup(propType);
+                        groupList = _generateDefaultGroup(propType);
                         break;
                     }
                     for (String value : _propUniqValues.get(propType)) {
@@ -92,21 +101,36 @@ public class CSamplePropertyMatrix {
                     CMConsole.logError("invalid property continuity value");
                     continue;
             }
-            _propertyGroupInfo.put(propType, groupList);
+            _propCroupInfo.put(propType, groupList);
+        }
+    }
+    
+    private void _linkProperties() {
+        _sampleNameToProperties = new LinkedHashMap<>();
+        for (String propType : _propOrder) {
+            ArrayList<SampleProperty> propertiesOfType = _propNameToProperties.get(propType);
+            for (int i = 0; i < propertiesOfType.size(); ++i) {
+                SampleProperty prop = propertiesOfType.get(i);
+                String sampleName = _sampleNames.get(i);
+                ArrayList<SampleProperty> propertiesOfCurSample = _sampleNameToProperties.get(sampleName);
+                if (propertiesOfCurSample == null) {
+                    propertiesOfCurSample = new ArrayList<>();
+                    _sampleNameToProperties.put(sampleName, propertiesOfCurSample);
+                }
+                propertiesOfCurSample.add(prop);
+            }
         }
     }
 
     // generate property objects based on values
     private void _generateProps() {
-        _sampleProperties = new LinkedHashMap<>();
-        _sampleNameToProperties = new LinkedHashMap<>();
+        _propNameToProperties = new LinkedHashMap<>();
         for (String propType : _propOrder) {
-            ArrayList<String> values = _propValuesForEachSample.get(propType);
-            boolean isContinuum = _propertyContinuity.get(propType).equals("con");
+            ArrayList<String> values = _propNameToPropStrings.get(propType);
+            boolean isContinuum = _propContinuity.get(propType).equals("con");
             ArrayList<SampleProperty> tmpProperties = new ArrayList<>();
             for (int i = 0; i < values.size(); ++i) {
                 String value = values.get(i);
-                String sampleName = _sampleNames.get(i);
                 SampleProperty property;
                 if (isContinuum) {
                     property = new ContinuousSampleProperty(propType, Double.parseDouble(value));
@@ -114,22 +138,16 @@ public class CSamplePropertyMatrix {
                     property = new CategorizedSampleProperty(propType, value);
                 }
                 tmpProperties.add(property);
-                ArrayList<SampleProperty> propertiesOfCurSample = _sampleNameToProperties.get(sampleName);
-                if (propertiesOfCurSample == null) {
-                    propertiesOfCurSample = new ArrayList<>();
-                    _sampleNameToProperties.put(sampleName, propertiesOfCurSample);
-                }
-                propertiesOfCurSample.add(property);
             }
-            _sampleProperties.put(propType, tmpProperties);
+            _propNameToProperties.put(propType, tmpProperties);
         }
     }
 
     // assign groups to properties
     private void _organizeGroup() {
         for (String propType : _propOrder) {
-            ArrayList<SampleProperty> tmpProperties = _sampleProperties.get(propType);
-            ArrayList<SamplePropertyGroup> groups = _propertyGroupInfo.get(propType);
+            ArrayList<SampleProperty> tmpProperties = _propNameToProperties.get(propType);
+            ArrayList<SamplePropertyGroup> groups = _propCroupInfo.get(propType);
 
             for (SampleProperty prop : tmpProperties) {
                 for (SamplePropertyGroup group : groups) {
@@ -143,7 +161,7 @@ public class CSamplePropertyMatrix {
     }
 
     // function to generate group
-    private ArrayList _fakeDefaultGroup(String propType) {
+    private ArrayList _generateDefaultGroup(String propType) {
         ArrayList<SamplePropertyGroup<Double>> result = new ArrayList<>();
 
         if (_propUniqValues.get(propType).size() <= 0) {
@@ -197,7 +215,7 @@ public class CSamplePropertyMatrix {
             _propOrder.set(index1, _propOrder.get(index2));
             _propOrder.set(index2, tmpName);
 
-            _reGenerateOntology();
+            _setUp();
         }
     }
 
@@ -220,7 +238,7 @@ public class CSamplePropertyMatrix {
             }
             _propOrder.set(to, tmpName);
 
-            _reGenerateOntology();
+            _setUp();
         }
     }
 
@@ -243,7 +261,7 @@ public class CSamplePropertyMatrix {
 
             _propOrder.addAll(to, tmpRemoved);
 
-            _reGenerateOntology();
+            _setUp();
         }
     }
 
@@ -264,7 +282,7 @@ public class CSamplePropertyMatrix {
             return;
         }
 
-        ArrayList<SamplePropertyGroup> curPropGroups = new ArrayList<>(_propertyGroupInfo.get(_propOrder.get(curPropIndex)));
+        ArrayList<SamplePropertyGroup> curPropGroups = new ArrayList<>(_propCroupInfo.get(_propOrder.get(curPropIndex)));
         for (SamplePropertyGroup group : curPropGroups) {
             String curLevelLable = prefix + "-" + group.customizedName;
             _ontology.addRelationshipNoUpdateDepth(prefix, curLevelLable);
@@ -356,7 +374,7 @@ public class CSamplePropertyMatrix {
 
     }
 
-    public abstract class SampleProperty<T> {
+    private abstract class SampleProperty<T> {
 
         public String propType; // type of this property, such as the type of MALE is GENDER
         private SamplePropertyGroup<T> _group;
