@@ -87,17 +87,17 @@ public final class CoolMapMaster {
         _activeCoolMapObject = null;
         _fireActiveCoolMapChanged(object, null);
 
-        List<CoolMapObject> coolMapObjects = new ArrayList<CoolMapObject>(_coolMapObjects);
+        List<CoolMapObject> coolMapObjects = new ArrayList<>(_coolMapObjects);
         for (CoolMapObject obj : coolMapObjects) {
             destroyCoolMapObject(obj);
         }
 
-        List<COntology> contologies = new ArrayList<COntology>(_contologies.values());
+        List<COntology> contologies = new ArrayList<>(_contologies.values());
         for (COntology ontology : contologies) {
             destroyCOntology(ontology);
         }
 
-        List<CMatrix> cmatrices = new ArrayList<CMatrix>(_cMatrices.values());
+        List<CMatrix> cmatrices = new ArrayList<>(_cMatrices.values());
         for (CMatrix matrix : cmatrices) {
             destroyCMatrix(matrix);
         }
@@ -111,7 +111,7 @@ public final class CoolMapMaster {
     }
 
     public static List<CoolMapObject> getCoolMapObjects() {
-        return new ArrayList<CoolMapObject>(_coolMapObjects);
+        return new ArrayList<>(_coolMapObjects);
     }
     
     public static CoolMapObject getCoolMapObjectByID(String ID){
@@ -127,7 +127,7 @@ public final class CoolMapMaster {
     
 
     /**
-     * initialize the neceesary elements
+     * initialize the necessary elements
      */
     public static void initialize() {
 
@@ -311,7 +311,7 @@ public final class CoolMapMaster {
     }
 
     public static List<CMatrix> getLoadedCMatrices() {
-        return new ArrayList<CMatrix>(_cMatrices.values());
+        return new ArrayList<>(_cMatrices.values());
     }
 
     public static COntology getCOntologyByID(String identifier) {
@@ -322,7 +322,7 @@ public final class CoolMapMaster {
     }
 
     public static List<COntology> getLoadedCOntologies() {
-        return new ArrayList<COntology>(_contologies.values());
+        return new ArrayList<>(_contologies.values());
     }
 
     public static void destroyCoolMapObject(CoolMapObject object) {

@@ -167,8 +167,10 @@ public class CSamplePropertyMatrix {
         ArrayList<SamplePropertyGroup<String>> groupList = new ArrayList<>();
 
         for (String value : _propUniqValues.get(propType)) {
-            CategorizedSamplePropertyGroup tmpGroup = new CategorizedSamplePropertyGroup(value);
-            tmpGroup.addValue(value);
+            HashSet<String> set = new HashSet<>();
+            set.add(value);
+            CategorizedSamplePropertyGroup tmpGroup = new CategorizedSamplePropertyGroup(set.toString());
+            tmpGroup.addAll(set);
             groupList.add(tmpGroup);
         }
         setting.addAll(groupList);
@@ -393,6 +395,18 @@ public class CSamplePropertyMatrix {
                 _group.remove(value);
             }
         }
+        
+        public void addAll(HashSet<String> values) {
+            _group.addAll(values);
+        }
+        
+        public void clear() {
+            _group.clear();
+        }
+        
+        public int getSize() {
+            return _group.size();
+        }
 
         @Override
         public boolean contains(String value) {
@@ -483,28 +497,23 @@ public class CSamplePropertyMatrix {
 
     private class PropertyGroupSetting {
         private final String _propType;
-        private int _groupNum;
         private final ArrayList<SamplePropertyGroup> _groups;
 
         public PropertyGroupSetting(String propType) {
             this._propType = propType;
-            _groupNum = 0;
             _groups = new ArrayList<>();
         }
 
         public void addAll(ArrayList groups) {
             _groups.addAll(groups);
-            _groupNum += groups.size();
         }
 
         public void clear() {
             _groups.clear();
-            _groupNum = 0;
         }
 
         public void addGroup(SamplePropertyGroup newGroup) {
             _groups.add(newGroup);
-            _groupNum++;
         }
 
         public void setWithNewGroups(ArrayList<SamplePropertyGroup> newGroups) {
@@ -513,7 +522,7 @@ public class CSamplePropertyMatrix {
         }
 
         public int getGroupNum() {
-            return _groupNum;
+            return _groups.size();
         }
 
         public ArrayList<SamplePropertyGroup> getGroups() {
@@ -536,7 +545,8 @@ public class CSamplePropertyMatrix {
                 if (!_allValues.containsAll(set)) {
                     return false;
                 }
-                SamplePropertyGroup group = new CategorizedSamplePropertyGroup(set.toString());
+                CategorizedSamplePropertyGroup group = new CategorizedSamplePropertyGroup(set.toString());
+                group.addAll(set);
                 newGroups.add(group);
             }
 
