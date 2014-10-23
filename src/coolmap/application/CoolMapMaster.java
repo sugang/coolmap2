@@ -386,6 +386,7 @@ public final class CoolMapMaster {
         return _samplePropertyMatrice.get(matrixName);
     }
     
+    // only for test
     public static CSamplePropertyMatrix getFirst() {
         Set<String> tmp = _samplePropertyMatrice.keySet();
         for (String key : tmp) {

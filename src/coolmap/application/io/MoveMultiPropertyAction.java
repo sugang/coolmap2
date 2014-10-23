@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coolmap.application.io.actions;
+package coolmap.application.io;
 
 import coolmap.application.CoolMapMaster;
 import coolmap.application.utils.LongTask;
@@ -16,22 +16,22 @@ import javax.swing.AbstractAction;
  *
  * @author Keqiang Li
  */
-public class FakeAction extends AbstractAction{
+class MoveMultiPropertyAction extends AbstractAction {
     
-    public FakeAction() {
-        super("fake");
-        putValue(javax.swing.AbstractAction.SHORT_DESCRIPTION, "fake");
+    public MoveMultiPropertyAction() {
+        super("move multi property");
+        putValue(javax.swing.AbstractAction.SHORT_DESCRIPTION, "move multi property");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        LongTask task = new LongTask("import sample property file...") {
+        LongTask task = new LongTask("moving multi property...") {
 
             @Override
             public void run() {
 
                 CSamplePropertyMatrix samplePropertyMatrix = CoolMapMaster.getFirst();
-                samplePropertyMatrix.movePropertyToIndex(1, 2);
+                samplePropertyMatrix.moveMultiPropertyToIndex(2, 2, 0);
                
 
             }
@@ -40,5 +40,5 @@ public class FakeAction extends AbstractAction{
         TaskEngine.getInstance().submitTask(task);
     }
     
+    
 }
-        

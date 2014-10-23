@@ -163,7 +163,7 @@ public class CSamplePropertyMatrix {
 
     // function to generate groups for continuous property
     private PropertyGroupSetting _generateDefaultGroupForCatagorizedProp(String propType) {
-        PropertyGroupSetting setting = new PropertyGroupSetting();
+        PropertyGroupSetting setting = new CategorizedPropertyGroupSetting(propType);
         ArrayList<SamplePropertyGroup<String>> groupList = new ArrayList<>();
 
         for (String value : _propUniqValues.get(propType)) {
@@ -190,7 +190,7 @@ public class CSamplePropertyMatrix {
             }
         }
 
-        ContinuousPropertyGroupSetting setting = new ContinuousPropertyGroupSetting(min, max);
+        ContinuousPropertyGroupSetting setting = new ContinuousPropertyGroupSetting(propType, min, max);
         ArrayList<SamplePropertyGroup<Double>> groupList = new ArrayList<>();
 
         if (_propUniqValues.get(propType).size() <= NUMBER_LIMIT_OF_UNIQUE_CONTINUOUS_VALUE) {
@@ -449,18 +449,45 @@ public class CSamplePropertyMatrix {
             return "" + value;
         }
     }
+    
+    private void _updateGroups() {
+        _assignGroup();
+        _reGenerateOntology();
+    }
+    
+    public boolean setCatePropGroup(String catePropType, ArrayList<HashSet> sets) {
+        if (!_propContinuity.get(catePropType).equals(PROPERTY_CONTINUITY_CATEGORIZED)) {
+            return false;
+        }
+        CategorizedPropertyGroupSetting setting = (CategorizedPropertyGroupSetting)_propGroupInfo.get(catePropType);
+        if (setting.setWithSets(sets)) {
+            _propGroupInfo.put(catePropType, setting);
+            _updateGroups();
+            return true;
+        }
+        return false;
+    }
 
     public boolean setContPropGroup(String contPropType, ArrayList<Double> values) {
+        if (!_propContinuity.get(contPropType).equals(PROPERTY_CONTINUITY_CONTINUOUS)) {
+            return false;
+        }
         ContinuousPropertyGroupSetting setting = (ContinuousPropertyGroupSetting) _propGroupInfo.get(contPropType);
-        return setting.setWithMarks(values);
+        if (setting.setWithMarks(values)) {
+            _propGroupInfo.put(contPropType, setting);
+            _updateGroups();
+            return true;
+        }
+        return false;
     }
 
     private class PropertyGroupSetting {
-
+        private final String _propType;
         private int _groupNum;
         private final ArrayList<SamplePropertyGroup> _groups;
 
-        public PropertyGroupSetting() {
+        public PropertyGroupSetting(String propType) {
+            this._propType = propType;
             _groupNum = 0;
             _groups = new ArrayList<>();
         }
@@ -493,14 +520,38 @@ public class CSamplePropertyMatrix {
             return _groups;
         }
     }
+    
+    private class CategorizedPropertyGroupSetting extends PropertyGroupSetting {
+        private final HashSet<String> _allValues;
+        
+        public CategorizedPropertyGroupSetting(String propType) {
+            super(propType);
+            _allValues = _propUniqValues.get(propType);
+        }
+        
+        public boolean setWithSets(ArrayList<HashSet> sets) {
+            ArrayList<SamplePropertyGroup> newGroups = new ArrayList<>();
+
+            for (HashSet set : sets) {
+                if (!_allValues.containsAll(set)) {
+                    return false;
+                }
+                SamplePropertyGroup group = new CategorizedSamplePropertyGroup(set.toString());
+                newGroups.add(group);
+            }
+
+            setWithNewGroups(newGroups);
+            return true;
+        }
+    }
 
     private class ContinuousPropertyGroupSetting extends PropertyGroupSetting {
 
         private final double _min;
         private final double _max;
 
-        public ContinuousPropertyGroupSetting(double min, double max) {
-            super();
+        public ContinuousPropertyGroupSetting(String propType, double min, double max) {
+            super(propType);
             this._min = min;
             this._max = max;
         }
@@ -522,7 +573,7 @@ public class CSamplePropertyMatrix {
                 if (marks.get(i) > marks.get(i + 1)) {
                     return false;
                 }
-                ContinuousSamplePropertyGroup group = new ContinuousSamplePropertyGroup("(" + marks.get(i) + "," + marks.get(i + 1) + "]", marks.get(i), marks.get(i + 1));
+                SamplePropertyGroup group = new ContinuousSamplePropertyGroup("(" + marks.get(i) + "," + marks.get(i + 1) + "]", marks.get(i), marks.get(i + 1));
                 newGroups.add(group);
             }
 
