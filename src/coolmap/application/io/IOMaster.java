@@ -4,6 +4,7 @@
  */
 package coolmap.application.io;
 
+import coolmap.application.io.actions.MoveMultiPropertyAction;
 import coolmap.application.CoolMapMaster;
 import coolmap.application.io.actions.SwitchTwoPropertyAction;
 import coolmap.application.io.actions.ImportCOntologyGMTAction;

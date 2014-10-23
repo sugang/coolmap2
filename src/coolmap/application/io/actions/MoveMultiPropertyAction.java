@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coolmap.application.io;
+package coolmap.application.io.actions;
 
 import coolmap.application.CoolMapMaster;
 import coolmap.application.utils.LongTask;
@@ -16,7 +16,7 @@ import javax.swing.AbstractAction;
  *
  * @author Keqiang Li
  */
-class MoveMultiPropertyAction extends AbstractAction {
+public class MoveMultiPropertyAction extends AbstractAction {
     
     public MoveMultiPropertyAction() {
         super("move multi property");
