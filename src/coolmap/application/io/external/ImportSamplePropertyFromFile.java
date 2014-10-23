@@ -22,7 +22,7 @@ import java.util.List;
  * @author Keqiang Li
  */
 public class ImportSamplePropertyFromFile {
-    public static COntology importSamplePropertyFromFile (File file) throws Exception {
+    public static CSamplePropertyMatrix importSamplePropertyFromFile (File file) throws Exception {
         
         BufferedReader reader = new BufferedReader(new FileReader(file));
         String line;
@@ -93,6 +93,6 @@ public class ImportSamplePropertyFromFile {
         
         CSamplePropertyMatrix samplePropertyMatrix = new CSamplePropertyMatrix(file.getPath(), propValuesForEachSample, sampleNames, propOrder, propUniqValues, contunuity);
         
-        return samplePropertyMatrix.getOntology();
+        return samplePropertyMatrix;
     }
 }

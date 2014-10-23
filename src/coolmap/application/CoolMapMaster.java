@@ -18,6 +18,7 @@ import coolmap.canvas.sidemaps.impl.RowTree;
 import coolmap.data.CoolMapObject;
 import coolmap.data.cmatrix.model.CMatrix;
 import coolmap.data.contology.model.COntology;
+import coolmap.data.contology.model.CSamplePropertyMatrix;
 import coolmap.module.ModuleMaster;
 import coolmap.utils.Config;
 import coolmap.utils.Tools;
@@ -29,6 +30,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -40,10 +42,16 @@ public final class CoolMapMaster {
 
     private final static ActiveCoolMapObjectListenerTunnel _activeCoolMapObjectListenerTunnel = ActiveCoolMapObjectListenerTunnel.getInstance();
     
-    private final static LinkedHashMap<String, CMatrix> _cMatrices = new LinkedHashMap<String, CMatrix>();
-    private final static LinkedHashSet<CoolMapObject> _coolMapObjects = new LinkedHashSet<CoolMapObject>();
-    private final static HashSet<ActiveCoolMapChangedListener> _activeCoolMapChangedListeners = new HashSet<ActiveCoolMapChangedListener>();
-    private final static LinkedHashMap<String, COntology> _contologies = new LinkedHashMap<String, COntology>();
+    private final static LinkedHashMap<String, CMatrix> _cMatrices = new LinkedHashMap<>();
+    private final static LinkedHashSet<CoolMapObject> _coolMapObjects = new LinkedHashSet<>();
+    private final static HashSet<ActiveCoolMapChangedListener> _activeCoolMapChangedListeners = new HashSet<>();
+    private final static LinkedHashMap<String, COntology> _contologies = new LinkedHashMap<>();
+    
+    /* edited by Keqiang Li, Oct. 23
+       This map keeps track for all property files imported
+    */
+    private final static LinkedHashMap<String, CSamplePropertyMatrix> _samplePropertyMatrice = new LinkedHashMap<>();
+    
     private static CoolMapObject _activeCoolMapObject = null;
     private static String _sessionName = null;
     
@@ -354,5 +362,35 @@ public final class CoolMapMaster {
         _contologies.remove(ontology.getID());
         ontology.destroy();
     }
-
+    
+    public static void addNewSamplePropertyMatrix(CSamplePropertyMatrix samplePropertyMatrix) {
+        _samplePropertyMatrice.put(samplePropertyMatrix.getMatrixName(), samplePropertyMatrix);
+        if (samplePropertyMatrix.getOntology() != null) {
+            addNewCOntology(samplePropertyMatrix.getOntology());
+        }
+        samplePropertyMatrix.setIsAdded(true);
+    }
+    
+    public static void removeSamplePropertyMatrix(CSamplePropertyMatrix samplePropertyMatrix)  {
+        removeSamplePropertyMatrix(samplePropertyMatrix.getMatrixName());
+    }
+    
+    public static void removeSamplePropertyMatrix(String matrixName) {
+        if (_samplePropertyMatrice.containsKey(matrixName)) {
+            _samplePropertyMatrice.get(matrixName).setIsAdded(false);
+            _samplePropertyMatrice.remove(matrixName);
+        }
+    }
+    
+    public static CSamplePropertyMatrix getSamplePropertyMatrix(String matrixName) {
+        return _samplePropertyMatrice.get(matrixName);
+    }
+    
+    public static CSamplePropertyMatrix getFirst() {
+        Set<String> tmp = _samplePropertyMatrice.keySet();
+        for (String key : tmp) {
+            return _samplePropertyMatrice.get(key);
+        }
+        return null;
+    }
 }

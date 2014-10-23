@@ -5,6 +5,7 @@
 package coolmap.application.io;
 
 import coolmap.application.CoolMapMaster;
+import coolmap.application.io.actions.FakeAction;
 import coolmap.application.io.actions.ImportCOntologyGMTAction;
 import coolmap.application.io.actions.ImportCOntologySIFAction;
 import coolmap.application.io.actions.ImportDataTSVAction;
@@ -89,10 +90,6 @@ public class IOMaster {
                     }
 
                     File projectDirectory = fileChooser.getSelectedFile();
-
-
-
-
                     //File projectDirectory = new File("/Users/gangsu/000");
 
                     if (projectDirectory == null || !projectDirectory.isDirectory()) {
@@ -367,29 +364,36 @@ public class IOMaster {
                 }
             }
         });
-
+        
+        /* edited by Keqiang Li
+        re-arrange the import and export menus
+        Import Sample-property menu item is used to import sample and property table file used to generate the ontology */
+        
         menuItem = new MenuItem("Numeric tab delimited (tsv)");
-        CoolMapMaster.getCMainFrame().addMenuItem("File/Import data", menuItem, false, false);
+        CoolMapMaster.getCMainFrame().addMenuItem("File/Import/Import data", menuItem, false, false);
         menuItem.addActionListener(new ImportDataTSVAction());
 
 
         menuItem = new MenuItem("Simple two column(sif)");
-        CoolMapMaster.getCMainFrame().addMenuItem("File/Import ontology", menuItem, false, false);
+        CoolMapMaster.getCMainFrame().addMenuItem("File/Import/Import ontology", menuItem, false, false);
         menuItem.addActionListener(new ImportCOntologySIFAction());
         
         menuItem = new MenuItem("GSEA gmt");
-        CoolMapMaster.getCMainFrame().addMenuItem("File/Import ontology", menuItem, false, false);
+        CoolMapMaster.getCMainFrame().addMenuItem("File/Import/Import ontology", menuItem, false, false);
         menuItem.addActionListener(new ImportCOntologyGMTAction());
         
-        /*
-        * edited by Keqiang Li
-        * This menu item is used to import sample and property table file used to generate the ontology
-        */
-        
         menuItem = new MenuItem("Sample-property table file");
-        CoolMapMaster.getCMainFrame().addMenuItem("File/Import ontology", menuItem, false, false);
+        CoolMapMaster.getCMainFrame().addMenuItem("File/Import", menuItem, false, false);
         menuItem.addActionListener(new ImportSamplePropertyTableAction());
 
+        /*
+        
+        For test uses only, test the reflection from modification of sample property table to ontologies
+        
+        */
+        menuItem = new MenuItem("switch 2 props");
+        CoolMapMaster.getCMainFrame().addMenuItem("File/Prop/Switch", menuItem, false, false);
+        menuItem.addActionListener(new FakeAction());
 
         menuItem = new MenuItem("view to TSV file");
 //        CoolMapMaster.getCMainFrame().addMenuItem("File/Export", menuItem, false, false);
@@ -439,10 +443,6 @@ public class IOMaster {
             }
         });
         
-        
-        
-        
-
         menuItem = new MenuItem("view to Excel file");
         CoolMapMaster.getCMainFrame().addMenuItem("File/Export", menuItem, false, false);
         menuItem.addActionListener(new ActionListener() {
@@ -517,16 +517,7 @@ public class IOMaster {
     public static void initialize() {
 
         _initActions();
-
-
-
-
-
-
-
-
-
-
+        
         System.out.println("Initialize IO Master..");
 
 
@@ -732,13 +723,8 @@ public class IOMaster {
                             objIO.writeRowColumnSnapshots(object, entryFolder);
 
                         }
-
-
-
+                        
                         //dump widgets and other info
-
-
-
 
                     } catch (Exception e) {
                         e.printStackTrace();

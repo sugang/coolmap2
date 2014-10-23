@@ -10,7 +10,7 @@ import coolmap.application.io.external.ImportSamplePropertyFromFile;
 import coolmap.application.utils.LongTask;
 import coolmap.application.utils.TaskEngine;
 import coolmap.application.widget.impl.console.CMConsole;
-import coolmap.data.contology.model.COntology;
+import coolmap.data.contology.model.CSamplePropertyMatrix;
 import coolmap.utils.Tools;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -23,7 +23,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author Keqiang Li
  */
 public class ImportSamplePropertyTableAction extends AbstractAction {
-    
+
     public ImportSamplePropertyTableAction() {
         super("from sample-property table file");
         putValue(javax.swing.AbstractAction.SHORT_DESCRIPTION, "import sample-property table file, and then generate ontology on it");
@@ -45,25 +45,22 @@ public class ImportSamplePropertyTableAction extends AbstractAction {
                 @Override
                 public void run() {
                     try {
-                        COntology ontology = ImportSamplePropertyFromFile.importSamplePropertyFromFile(f);
-                        if(ontology == null)
+                        CSamplePropertyMatrix samplePropertyMatrix = ImportSamplePropertyFromFile.importSamplePropertyFromFile(f);
+                        if (samplePropertyMatrix == null) {
                             return;
+                        }
                         
-                        ontology.setName(Tools.removeFileExtension(f.getName()));
-                        CoolMapMaster.addNewCOntology(ontology);
-                       
+                        CoolMapMaster.addNewSamplePropertyMatrix(samplePropertyMatrix);
+
                         CMConsole.logInSuccess("File imported sample property file and ontology generated " + f.getPath());
                     } catch (Exception ex) {
                         CMConsole.logError("Error: failed to import sample-property file from " + f.getName());
                     }
                 }
             };
-            
+
             TaskEngine.getInstance().submitTask(task);
 
         }
-        
-        
     }
-    
 }
