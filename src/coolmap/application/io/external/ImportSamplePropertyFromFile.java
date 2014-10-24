@@ -5,7 +5,6 @@
  */
 package coolmap.application.io.external;
 
-import coolmap.data.contology.model.COntology;
 import coolmap.data.contology.model.CSamplePropertyMatrix;
 import java.io.BufferedReader;
 import java.io.File;

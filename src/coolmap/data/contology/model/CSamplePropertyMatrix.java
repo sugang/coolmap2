@@ -25,10 +25,11 @@ public class CSamplePropertyMatrix {
     // each sample-property table will be named as the imported file's name
     private final String _matrixName;
 
-    // continurity of the property
+    // continurity of the property 
     public static final String PROPERTY_CONTINUITY_CONTINUOUS = "con";
     public static final String PROPERTY_CONTINUITY_CATEGORIZED = "cat";
 
+    // if a continuous property has more that 10 unique values, it will be automatically grouped
     public static final int NUMBER_LIMIT_OF_UNIQUE_CONTINUOUS_VALUE = 10;
     // use the property name as key, each entry contains what this property value is for each sample
     private final LinkedHashMap<String, ArrayList<String>> _propNameToPropValues;
