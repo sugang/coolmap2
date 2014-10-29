@@ -16,7 +16,8 @@
                     "coolmap.application.widget.impl.WidgetRadar",
                     "coolmap.application.widget.impl.WidgetPointAnnotation",
                     "coolmap.application.widget.impl.WidgetFilter",
-                    "coolmap.application.widget.impl.console.WidgetConsole"
+                    "coolmap.application.widget.impl.console.WidgetConsole",
+                    "coolmap.application.widget.impl.WidgetSamplePropertyTable"
                  ],
         "config": {
             "coolmap.application.widget.impl.WidgetViewRenderer":

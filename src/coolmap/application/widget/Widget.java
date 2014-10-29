@@ -29,12 +29,16 @@ public abstract class Widget {
     public static final int L_LEFTTOP = 0;
     public static final int L_LEFTCENTER = 1;
     public static final int L_LEFTBOTTOM = 2;
+    // top right
     public static final int L_VIEWPORT = 3;
+    // bottom right
     public static final int L_DATAPORT = 4;
     
 //    widget types
     public static final int W_VIEWPORT = -1;
     public static final int W_MODULE = -2;
+    
+    // to show data
     public static final int W_DATA = -3;
     
 //    
@@ -47,7 +51,7 @@ public abstract class Widget {
     private String _description = null;
     private String _title = null;
 //    private String _id = null;
-
+ 
     
     /**
      * save state of a widget to json string

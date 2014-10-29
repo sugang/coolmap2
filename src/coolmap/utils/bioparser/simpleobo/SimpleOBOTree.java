@@ -5,6 +5,7 @@
 package coolmap.utils.bioparser.simpleobo;
 
 import com.google.common.collect.HashMultimap;
+import coolmap.data.contology.model.COntology;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +23,8 @@ public class SimpleOBOTree {
 
     private HashMultimap<String, String> goTree = HashMultimap.create();
     private HashMap<String, SimpleOBOEntry> goTermHash = new HashMap<>();
+    
+    public COntology ontology;
 
     public void addEntry(SimpleOBOEntry entry) {
         goTermHash.put(entry.getID(), entry);
@@ -94,6 +97,72 @@ public class SimpleOBOTree {
         return simpleOboTree;
     }
     
+     public static SimpleOBOTree parse1(String name, InputStream in) throws IOException {
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        String line = null;
+        SimpleOBOEntry currentEntry = null;
+        String currentChildTerm = null;
+        SimpleOBOTree simpleOboTree = new SimpleOBOTree();
+        simpleOboTree.ontology = new COntology(name, "parsed ontology");
+
+        while ((line = reader.readLine()) != null) {
+            line = line.trim();
+
+            if (line.length() == 0) {
+                if (currentEntry != null) {
+                    simpleOboTree.addEntry(currentEntry); //if it's not null, add a new entry
+                    currentEntry = null;
+                }
+                continue;
+            } else if (line.startsWith("[Term]")) {
+                currentEntry = new SimpleOBOEntry();
+                //
+            } else if (currentEntry != null) {
+
+                if (line.startsWith("id:")) {
+                    //the current entry must not be null
+                    //try{
+                    currentChildTerm = line.substring(3);
+                    currentEntry.setID(currentChildTerm);
+                    //}
+                    //catch(Exception e){
+                    //    System.out.println(line);
+                    //}
+                    continue;
+                } else if (line.startsWith("name:")) {
+                    //the current entry must not be null
+                    currentEntry.setName(line.substring(5));
+                    continue;
+                } else if (line.startsWith("namespace:")) {
+                    //the current entry must not be null
+                    currentEntry.setNamespace(line.substring(10));
+                    continue;
+                } else if (line.startsWith("is_a:")) {
+                    //the current entry must not be null
+                    line = line.substring(5);
+                    //line = line.substring(0, line.indexOf(" "));
+                    simpleOboTree.addTreeBranch(line, currentChildTerm);
+                    currentEntry.addParent(line);
+                    simpleOboTree.ontology.addRelationshipNoUpdateDepth(line, currentChildTerm);
+                    continue;
+                } else {
+                    //add attributes
+
+                    //System.out.println(line);
+
+                    String ele[] = line.split(": ", 2); //why limit is 2?
+                    currentEntry.addAttribute(ele[0], ele[1]);
+
+
+                }
+            }
+        }
+
+        simpleOboTree.ontology.validate();
+        return simpleOboTree;
+    }
+    
     public void printEntries(){
         System.out.println("Printing " + goTermHash.size() + " entries");
         for(SimpleOBOEntry entry : goTermHash.values()){
@@ -141,6 +210,8 @@ public class SimpleOBOTree {
         entries.addAll(goTermHash.values());
         return entries;
     }
+    
+    
     
     
 }

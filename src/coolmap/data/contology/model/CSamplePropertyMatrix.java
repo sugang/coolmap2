@@ -300,7 +300,7 @@ public class CSamplePropertyMatrix {
         _mapSamplesToOntology();
 
         _ontology.validate();
-
+        
         if (_isAdded) {
             CoolMapMaster.addNewCOntology(_ontology);
         }

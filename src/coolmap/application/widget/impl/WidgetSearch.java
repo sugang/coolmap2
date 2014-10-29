@@ -46,6 +46,7 @@ public class WidgetSearch extends Widget implements CObjectListener, ActiveCoolM
     private JTextField _searchField = new JTextField();
 
     public WidgetSearch() {
+        // module is small ones, 
         super("Search", W_MODULE, L_LEFTTOP, UI.getImageIcon("search"), "Search for nodes in the current view");
         CoolMapMaster.getActiveCoolMapObjectListenerDelegate().addCObjectListener(this);
         CoolMapMaster.addActiveCoolMapChangedListener(this);
