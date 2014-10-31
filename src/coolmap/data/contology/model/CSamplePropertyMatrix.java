@@ -69,6 +69,15 @@ public class CSamplePropertyMatrix {
 
         _setUp();
     }
+    
+    public ArrayList<String> getPropertyValuesForSample(String sampleName) {
+        ArrayList<String> result = new ArrayList<>();
+        
+        for (SampleProperty property : _sampleNameToProperties.get(sampleName)) {
+            result.add(property.getDisplayValue());
+        }
+        return result;
+    }
 
     public void setIsAdded(boolean isAdded) {
         _isAdded = isAdded;
