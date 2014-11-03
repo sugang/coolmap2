@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coolmap.data.contology.model;
+package coolmap.data.contology.spmatrix;
 
 import coolmap.application.CoolMapMaster;
 import coolmap.application.widget.impl.console.CMConsole;
+import coolmap.data.contology.model.COntology;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,10 +70,10 @@ public class CSamplePropertyMatrix {
 
         _setUp();
     }
-    
+
     public ArrayList<String> getPropertyValuesForSample(String sampleName) {
         ArrayList<String> result = new ArrayList<>();
-        
+
         for (SampleProperty property : _sampleNameToProperties.get(sampleName)) {
             result.add(property.getDisplayValue());
         }
@@ -173,7 +174,7 @@ public class CSamplePropertyMatrix {
 
     // function to generate groups for continuous property
     private PropertyGroupSetting _generateDefaultGroupForCatagorizedProp(String propType) {
-        PropertyGroupSetting setting = new CategorizedPropertyGroupSetting(propType);
+        PropertyGroupSetting setting = new CategorizedPropertyGroupSetting(propType, _propUniqValues.get(propType));
         ArrayList<SamplePropertyGroup<String>> groupList = new ArrayList<>();
 
         for (String value : _propUniqValues.get(propType)) {
@@ -309,7 +310,7 @@ public class CSamplePropertyMatrix {
         _mapSamplesToOntology();
 
         _ontology.validate();
-        
+
         if (_isAdded) {
             CoolMapMaster.addNewCOntology(_ontology);
         }
@@ -342,148 +343,20 @@ public class CSamplePropertyMatrix {
         }
     }
 
-    // user customized property group. users may group values from 1 to 100 as group "1-100"
-    private abstract class SamplePropertyGroup<T> {
-
-        public String customizedName;
-
-        public SamplePropertyGroup(String name) {
-            customizedName = name;
-        }
-
-        public abstract boolean contains(T value);
-    }
-
-    private class ContinuousSamplePropertyGroup extends SamplePropertyGroup<Double> {
-
-        private double _min;
-        private double _max;
-
-        public ContinuousSamplePropertyGroup(String name, double min, double max) {
-            super(name);
-            this._min = min;
-            this._max = max;
-        }
-
-        public boolean setMin(double min) {
-            if (min <= _max) {
-                _min = min;
-                return true;
-            }
-            return false;
-        }
-
-        public boolean setMax(double max) {
-            if (max >= _min) {
-                _max = max;
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public boolean contains(Double value) {
-            return value > _min && value <= _max;
-        }
-    }
-
-    private class CategorizedSamplePropertyGroup extends SamplePropertyGroup<String> {
-
-        private final HashSet<String> _group;
-
-        public CategorizedSamplePropertyGroup(String name) {
-            super(name);
-            _group = new HashSet<>();
-        }
-
-        public void addValue(String value) {
-            _group.add(value);
-        }
-
-        public void removeValue(String value) {
-            if (_group.contains(value)) {
-                _group.remove(value);
-            }
-        }
-        
-        public void addAll(HashSet<String> values) {
-            _group.addAll(values);
-        }
-        
-        public void clear() {
-            _group.clear();
-        }
-        
-        public int getSize() {
-            return _group.size();
-        }
-
-        @Override
-        public boolean contains(String value) {
-            return _group.contains(value);
-        }
-
-    }
-
-    private abstract class SampleProperty<T> {
-
-        public String propType; // type of this property, such as the type of MALE is GENDER
-        private SamplePropertyGroup<T> _group;
-        public T value;
-
-        public SampleProperty(String propType, T value) {
-            this.propType = propType;
-            this.value = value;
-        }
-
-        public void setGroup(SamplePropertyGroup<T> group) {
-            _group = group;
-        }
-
-        public String getDisplayName() {
-            if (_group != null) {
-                return _group.customizedName;
-            }
-            return getDisplayValue();
-        }
-
-        public abstract String getDisplayValue();
-    }
-
-    public class CategorizedSampleProperty extends SampleProperty<String> {
-
-        public CategorizedSampleProperty(String propType, String value) {
-            super(propType, value);
-        }
-
-        @Override
-        public String getDisplayValue() {
-            return value;
-        }
-    }
-
-    public class ContinuousSampleProperty extends SampleProperty<Double> {
-
-        public ContinuousSampleProperty(String propType, double value) {
-            super(propType, value);
-        }
-
-        @Override
-        public String getDisplayValue() {
-            return "" + value;
-        }
-    }
-    
     private void _updateGroups() {
         _assignGroup();
         _reGenerateOntology();
     }
     
+    public void setPropGroup(String catePropType, PropertyGroupSetting groupSetting) {
+        _propGroupInfo.put(catePropType, groupSetting);
+    }
+
     public boolean setCatePropGroup(String catePropType, ArrayList<HashSet> sets) {
         if (!_propContinuity.get(catePropType).equals(PROPERTY_CONTINUITY_CATEGORIZED)) {
             return false;
         }
-        CategorizedPropertyGroupSetting setting = (CategorizedPropertyGroupSetting)_propGroupInfo.get(catePropType);
+        CategorizedPropertyGroupSetting setting = (CategorizedPropertyGroupSetting) _propGroupInfo.get(catePropType);
         if (setting.setWithSets(sets)) {
             _propGroupInfo.put(catePropType, setting);
             _updateGroups();
@@ -505,100 +378,14 @@ public class CSamplePropertyMatrix {
         return false;
     }
 
-    private class PropertyGroupSetting {
-        private final String _propType;
-        private final ArrayList<SamplePropertyGroup> _groups;
-
-        public PropertyGroupSetting(String propType) {
-            this._propType = propType;
-            _groups = new ArrayList<>();
-        }
-
-        public void addAll(ArrayList groups) {
-            _groups.addAll(groups);
-        }
-
-        public void clear() {
-            _groups.clear();
-        }
-
-        public void addGroup(SamplePropertyGroup newGroup) {
-            _groups.add(newGroup);
-        }
-
-        public void setWithNewGroups(ArrayList<SamplePropertyGroup> newGroups) {
-            clear();
-            addAll(newGroups);
-        }
-
-        public int getGroupNum() {
-            return _groups.size();
-        }
-
-        public ArrayList<SamplePropertyGroup> getGroups() {
-            return _groups;
-        }
+    public PropertyGroupSetting getGroupSettingForProperty(int col) {
+        if (col < 0 || col > _propOrder.size() - 1) return null;
+        String propType = _propOrder.get(col);
+        return getGroupSettingForProperty(propType);
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    private class CategorizedPropertyGroupSetting extends PropertyGroupSetting {
-        private final HashSet<String> _allValues;
-        
-        public CategorizedPropertyGroupSetting(String propType) {
-            super(propType);
-            _allValues = _propUniqValues.get(propType);
-        }
-        
-        public boolean setWithSets(ArrayList<HashSet> sets) {
-            ArrayList<SamplePropertyGroup> newGroups = new ArrayList<>();
-
-            for (HashSet set : sets) {
-                if (!_allValues.containsAll(set)) {
-                    return false;
-                }
-                CategorizedSamplePropertyGroup group = new CategorizedSamplePropertyGroup(set.toString());
-                group.addAll(set);
-                newGroups.add(group);
-            }
-
-            setWithNewGroups(newGroups);
-            return true;
-        }
-    }
-
-    private class ContinuousPropertyGroupSetting extends PropertyGroupSetting {
-
-        private final double _min;
-        private final double _max;
-
-        public ContinuousPropertyGroupSetting(String propType, double min, double max) {
-            super(propType);
-            this._min = min;
-            this._max = max;
-        }
-
-        public double getMin() {
-            return _min;
-        }
-
-        public double getMax() {
-            return _max;
-        }
-
-        public boolean setWithMarks(ArrayList<Double> marks) {
-            ArrayList<SamplePropertyGroup> newGroups = new ArrayList<>();
-
-            marks.add(marks.size(), _max);
-            marks.add(0, _min - 1);
-            for (int i = 0; i < marks.size() - 1; ++i) {
-                if (marks.get(i) > marks.get(i + 1)) {
-                    return false;
-                }
-                SamplePropertyGroup group = new ContinuousSamplePropertyGroup("(" + marks.get(i) + "," + marks.get(i + 1) + "]", marks.get(i), marks.get(i + 1));
-                newGroups.add(group);
-            }
-
-            setWithNewGroups(newGroups);
-            return true;
-        }
+    public PropertyGroupSetting getGroupSettingForProperty(String propType) {
+        return _propGroupInfo.get(propType);
     }
 }

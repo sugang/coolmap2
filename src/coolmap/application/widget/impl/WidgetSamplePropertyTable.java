@@ -7,16 +7,26 @@ package coolmap.application.widget.impl;
 
 import coolmap.application.CoolMapMaster;
 import coolmap.application.widget.Widget;
-import coolmap.data.contology.model.CSamplePropertyMatrix;
+import coolmap.data.contology.spmatrix.CSamplePropertyMatrix;
+import coolmap.data.contology.spmatrix.CategorizedPropertyGroupSetting;
+import coolmap.data.contology.spmatrix.ContinuousPropertyGroupSetting;
+import coolmap.data.contology.spmatrix.PropertyGroupSetting;
+import coolmap.data.contology.spmatrix.SamplePropertyGroup;
 import coolmap.utils.graphics.UI;
 import java.awt.BorderLayout;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -45,6 +55,73 @@ public class WidgetSamplePropertyTable extends Widget {
         _container.setLayout(new BorderLayout());
         
         _container.add(scrollPane);
+        
+        _dataTable.getTableHeader().addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Point pt = e.getPoint();
+                int col = _dataTable.columnAtPoint(pt);
+                if (e.getClickCount() != 2 || col <= 0) {
+                    return;
+                }
+                        
+                // create a dialog to let user set group info
+                JDialog dialog = new JDialog(CoolMapMaster.getCMainFrame(), "Customize Groups");
+                dialog.setLocation(pt);
+                
+                PropertyGroupSetting originalSetting = CoolMapMaster.getFirst().getGroupSettingForProperty(col - 1);
+                if (originalSetting == null) {
+                    return;
+                }
+                if (originalSetting instanceof ContinuousPropertyGroupSetting) {
+                   
+                    JButton b1 = new JButton("1");
+                    dialog.add(b1);
+                } else {
+                    
+                    CategorizedPropertyGroupSetting setting = (CategorizedPropertyGroupSetting)originalSetting;
+                    ArrayList<SamplePropertyGroup> groups = setting.getGroups();
+                    
+                    Object data[][] = new Object[groups.size()][1];
+                    
+                    for (int i = 0; i < groups.size(); ++i) {
+                        data[i][0] = groups.get(i);
+                    }
+                    
+                    String headers[] = {"Groups"};
+                    DefaultTableModel model = new DefaultTableModel(data, headers);
+                    JTable groupTable = new JXTable(model);
+                    dialog.add(groupTable);
+                }
+                
+                dialog.setSize(50, 50);
+                dialog.setVisible(true);
+                // CoolMapMaster.lookupPropertyAtIndex(col);
+                
+                
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
     }
     
     private class DataTableModel extends DefaultTableModel {
@@ -94,16 +171,17 @@ public class WidgetSamplePropertyTable extends Widget {
             tableHeaders.add(propType);
         }
         
-
         String[] headers = new String[tableHeaders.size()];
         tableHeaders.toArray(headers);
 
         Object[][] data = new Object[matrix.getSampleNames().size()][tableHeaders.size()];
         
         for (int i = 0; i < data.length; i++) {
-            ArrayList<String> samplePropertyValues = matrix.getPropertyValuesForSample(matrix.getSampleNames().get(i));
-            for (int j = 0; j < tableHeaders.size(); j++) {
-                data[i][j] = samplePropertyValues.get(j);
+            String curSampleName = matrix.getSampleNames().get(i);
+            ArrayList<String> samplePropertyValues = matrix.getPropertyValuesForSample(curSampleName);
+            data[i][0] = curSampleName;
+            for (int j = 0; j < tableHeaders.size() - 1; j++) {
+                data[i][j + 1] = samplePropertyValues.get(j);
             }
         }
 
@@ -112,16 +190,14 @@ public class WidgetSamplePropertyTable extends Widget {
         return model;
     }
     
-    private void _updateTable(final CSamplePropertyMatrix dataMatrix) {
-
+    public void updateTable(final CSamplePropertyMatrix dataMatrix) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 DefaultTableModel model = _getOntologyAsTableModel(dataMatrix);       
                 _dataTable.setModel(model);
             }
-
         });
     }
-    
+
 }

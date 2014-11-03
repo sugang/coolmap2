@@ -10,7 +10,7 @@ import coolmap.application.io.external.ImportSamplePropertyFromFile;
 import coolmap.application.utils.LongTask;
 import coolmap.application.utils.TaskEngine;
 import coolmap.application.widget.impl.console.CMConsole;
-import coolmap.data.contology.model.CSamplePropertyMatrix;
+import coolmap.data.contology.spmatrix.CSamplePropertyMatrix;
 import coolmap.utils.Tools;
 import java.awt.event.ActionEvent;
 import java.io.File;

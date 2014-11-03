@@ -8,11 +8,13 @@ import coolmap.application.CoolMapMaster;
 import coolmap.application.widget.impl.WidgetAggregator;
 import coolmap.application.widget.impl.WidgetCMatrix;
 import coolmap.application.widget.impl.WidgetDataMatrix;
+import coolmap.application.widget.impl.WidgetSamplePropertyTable;
 import coolmap.application.widget.impl.WidgetSearch;
 import coolmap.application.widget.impl.WidgetSyncer;
 import coolmap.application.widget.impl.WidgetViewRenderer;
 import coolmap.application.widget.impl.WidgetViewport;
 import coolmap.application.widget.impl.ontology.WidgetCOntology;
+import coolmap.data.contology.spmatrix.CSamplePropertyMatrix;
 import coolmap.utils.Config;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +36,7 @@ public class WidgetMaster {
     }
 
     //public static String CANVAS = "coolmap.application.widget.impl.WidgetViewport";
-    private static HashMap<String, Widget> _coolMapWidgets = new HashMap<String, Widget>();
+    private static final HashMap<String, Widget> _coolMapWidgets = new HashMap<>();
 
     public static void addWidget(Widget widget) {
 
@@ -136,7 +138,6 @@ public class WidgetMaster {
                 
             } catch (JSONException e) {
                 initializeDefaults();
-                return;
             }
 
         } else {
@@ -167,11 +168,9 @@ public class WidgetMaster {
     public static Widget getWidget(String className) {
         if (className != null) {
             //System.out.println("Getting: " + className);
-
             return _coolMapWidgets.get(className);
-        } else {
-            return null;
-        }
+        } 
+        return null;
     }
 
     public static WidgetViewport getViewport() {
@@ -185,6 +184,14 @@ public class WidgetMaster {
         } catch (Exception e) {
             return null;
         }
+    }
+    
+    
+    public static void updateSamplePropertyWidget(CSamplePropertyMatrix matrix) {
+        String widgetName = WidgetSamplePropertyTable.class.getName();
+        WidgetSamplePropertyTable samplePropertyWidget = (WidgetSamplePropertyTable)getWidget(widgetName);
+        
+        samplePropertyWidget.updateTable(matrix);
     }
 
 }

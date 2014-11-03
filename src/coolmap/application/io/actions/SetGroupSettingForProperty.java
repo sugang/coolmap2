@@ -8,7 +8,7 @@ package coolmap.application.io.actions;
 import coolmap.application.CoolMapMaster;
 import coolmap.application.utils.LongTask;
 import coolmap.application.utils.TaskEngine;
-import coolmap.data.contology.model.CSamplePropertyMatrix;
+import coolmap.data.contology.spmatrix.CSamplePropertyMatrix;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -18,7 +18,7 @@ import coolmap.canvas.sidemaps.impl.RowTree;
 import coolmap.data.CoolMapObject;
 import coolmap.data.cmatrix.model.CMatrix;
 import coolmap.data.contology.model.COntology;
-import coolmap.data.contology.model.CSamplePropertyMatrix;
+import coolmap.data.contology.spmatrix.CSamplePropertyMatrix;
 import coolmap.module.ModuleMaster;
 import coolmap.utils.Config;
 import coolmap.utils.Tools;

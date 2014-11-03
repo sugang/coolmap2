@@ -5,7 +5,8 @@
  */
 package coolmap.application.io.external;
 
-import coolmap.data.contology.model.CSamplePropertyMatrix;
+import coolmap.application.widget.WidgetMaster;
+import coolmap.data.contology.spmatrix.CSamplePropertyMatrix;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -91,6 +92,8 @@ public class ImportSamplePropertyFromFile {
         reader.close();
         
         CSamplePropertyMatrix samplePropertyMatrix = new CSamplePropertyMatrix(file.getPath(), propValuesForEachSample, sampleNames, propOrder, propUniqValues, contunuity);
+        
+        WidgetMaster.updateSamplePropertyWidget(samplePropertyMatrix);
         
         return samplePropertyMatrix;
     }
