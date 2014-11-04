@@ -347,9 +347,17 @@ public class CSamplePropertyMatrix {
         _assignGroup();
         _reGenerateOntology();
     }
-    
+
     public void setPropGroup(String catePropType, PropertyGroupSetting groupSetting) {
         _propGroupInfo.put(catePropType, groupSetting);
+        _updateGroups();
+    }
+
+    public boolean setCatePropGroup(int index, ArrayList<HashSet> sets) {
+        if (index < 0 || index > _propOrder.size() - 1) {
+            return false;
+        }
+        return setCatePropGroup(_propOrder.get(index), sets);
     }
 
     public boolean setCatePropGroup(String catePropType, ArrayList<HashSet> sets) {
@@ -363,6 +371,13 @@ public class CSamplePropertyMatrix {
             return true;
         }
         return false;
+    }
+
+    public boolean setContPropGroup(int index, ArrayList<Double> values) {
+        if (index < 0 || index > _propOrder.size() - 1) {
+            return false;
+        }
+        return setContPropGroup(_propOrder.get(index), values);
     }
 
     public boolean setContPropGroup(String contPropType, ArrayList<Double> values) {
@@ -379,13 +394,22 @@ public class CSamplePropertyMatrix {
     }
 
     public PropertyGroupSetting getGroupSettingForProperty(int col) {
-        if (col < 0 || col > _propOrder.size() - 1) return null;
+        if (col < 0 || col > _propOrder.size() - 1) {
+            return null;
+        }
         String propType = _propOrder.get(col);
         return getGroupSettingForProperty(propType);
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     public PropertyGroupSetting getGroupSettingForProperty(String propType) {
         return _propGroupInfo.get(propType);
+    }
+    
+    public String getPropType(int index) {
+        if (index < 0 || index > _propOrder.size() - 1) {
+            return null;
+        }
+        return _propOrder.get(index);
     }
 }
