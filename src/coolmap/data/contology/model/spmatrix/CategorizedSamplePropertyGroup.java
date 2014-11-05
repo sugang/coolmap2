@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coolmap.data.contology.spmatrix;
+package coolmap.data.contology.model.spmatrix;
 
 import java.util.HashSet;
 

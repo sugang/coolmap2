@@ -8,13 +8,11 @@ import coolmap.application.CoolMapMaster;
 import coolmap.application.widget.impl.WidgetAggregator;
 import coolmap.application.widget.impl.WidgetCMatrix;
 import coolmap.application.widget.impl.WidgetDataMatrix;
-import coolmap.application.widget.impl.WidgetSamplePropertyTable;
 import coolmap.application.widget.impl.WidgetSearch;
 import coolmap.application.widget.impl.WidgetSyncer;
 import coolmap.application.widget.impl.WidgetViewRenderer;
 import coolmap.application.widget.impl.WidgetViewport;
 import coolmap.application.widget.impl.ontology.WidgetCOntology;
-import coolmap.data.contology.spmatrix.CSamplePropertyMatrix;
 import coolmap.utils.Config;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -185,13 +183,4 @@ public class WidgetMaster {
             return null;
         }
     }
-    
-    
-    public static void updateSamplePropertyWidget(CSamplePropertyMatrix matrix) {
-        String widgetName = WidgetSamplePropertyTable.class.getName();
-        WidgetSamplePropertyTable samplePropertyWidget = (WidgetSamplePropertyTable)getWidget(widgetName);
-        
-        samplePropertyWidget.updateTable(matrix);
-    }
-
 }

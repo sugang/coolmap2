@@ -5,10 +5,10 @@
  */
 package coolmap.application.io.actions;
 
-import coolmap.application.CoolMapMaster;
+import coolmap.application.SamplePropertyMaster;
 import coolmap.application.utils.LongTask;
 import coolmap.application.utils.TaskEngine;
-import coolmap.data.contology.spmatrix.CSamplePropertyMatrix;
+import coolmap.data.contology.model.spmatrix.CSamplePropertyMatrix;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ public class SetGroupSettingForProperty extends AbstractAction{
 
                 Double[] tmp = {35.7, 48.2, 67.3, 80.0};
                 ArrayList<Double> newGroup = new ArrayList<>(Arrays.asList(tmp));
-                CSamplePropertyMatrix samplePropertyMatrix = CoolMapMaster.getFirst();
+                CSamplePropertyMatrix samplePropertyMatrix = SamplePropertyMaster.getFirst();
                 samplePropertyMatrix.setContPropGroup("BMI", newGroup);
                
                 

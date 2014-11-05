@@ -5,10 +5,10 @@
  */
 package coolmap.application.io.actions;
 
-import coolmap.application.CoolMapMaster;
+import coolmap.application.SamplePropertyMaster;
 import coolmap.application.utils.LongTask;
 import coolmap.application.utils.TaskEngine;
-import coolmap.data.contology.spmatrix.CSamplePropertyMatrix;
+import coolmap.data.contology.model.spmatrix.CSamplePropertyMatrix;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
@@ -30,7 +30,7 @@ public class SwitchTwoPropertyAction extends AbstractAction{
             @Override
             public void run() {
 
-                CSamplePropertyMatrix samplePropertyMatrix = CoolMapMaster.getFirst();
+                CSamplePropertyMatrix samplePropertyMatrix = SamplePropertyMaster.getFirst();
                 samplePropertyMatrix.movePropertyToIndex(1, 2);
                
 

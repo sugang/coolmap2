@@ -6,11 +6,12 @@
 package coolmap.application.io.actions;
 
 import coolmap.application.CoolMapMaster;
+import coolmap.application.SamplePropertyMaster;
 import coolmap.application.io.external.ImportSamplePropertyFromFile;
 import coolmap.application.utils.LongTask;
 import coolmap.application.utils.TaskEngine;
 import coolmap.application.widget.impl.console.CMConsole;
-import coolmap.data.contology.spmatrix.CSamplePropertyMatrix;
+import coolmap.data.contology.model.spmatrix.CSamplePropertyMatrix;
 import coolmap.utils.Tools;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -50,7 +51,7 @@ public class ImportSamplePropertyTableAction extends AbstractAction {
                             return;
                         }
                         
-                        CoolMapMaster.addNewSamplePropertyMatrix(samplePropertyMatrix);
+                        SamplePropertyMaster.addNewSamplePropertyMatrix(samplePropertyMatrix);
 
                         CMConsole.logInSuccess("File imported sample property file and ontology generated " + f.getPath());
                     } catch (Exception ex) {

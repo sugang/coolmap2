@@ -3,20 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coolmap.data.contology.spmatrix;
+package coolmap.data.contology.model.spmatrix;
 
 /**
  *
  * @author Keqiang Li
  */
-public class ContinuousSampleProperty extends SampleProperty<Double> {
+public class CategorizedSampleProperty extends SampleProperty<String> {
 
-    public ContinuousSampleProperty(String propType, double value) {
+    public CategorizedSampleProperty(String propType, String value) {
         super(propType, value);
     }
 
     @Override
     public String getDisplayValue() {
-        return "" + value;
+        return value;
     }
 }

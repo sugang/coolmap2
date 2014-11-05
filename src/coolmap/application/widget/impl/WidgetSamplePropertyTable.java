@@ -7,11 +7,11 @@ package coolmap.application.widget.impl;
 
 import coolmap.application.CoolMapMaster;
 import coolmap.application.widget.Widget;
-import coolmap.data.contology.spmatrix.CSamplePropertyMatrix;
-import coolmap.data.contology.spmatrix.CategorizedPropertyGroupSetting;
-import coolmap.data.contology.spmatrix.ContinuousPropertyGroupSetting;
-import coolmap.data.contology.spmatrix.PropertyGroupSetting;
-import coolmap.data.contology.spmatrix.SamplePropertyGroup;
+import coolmap.data.contology.model.spmatrix.CSamplePropertyMatrix;
+import coolmap.data.contology.model.spmatrix.CategorizedPropertyGroupSetting;
+import coolmap.data.contology.model.spmatrix.ContinuousPropertyGroupSetting;
+import coolmap.data.contology.model.spmatrix.PropertyGroupSetting;
+import coolmap.data.contology.model.spmatrix.SamplePropertyGroup;
 import coolmap.utils.graphics.UI;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -30,6 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
@@ -45,6 +46,7 @@ public class WidgetSamplePropertyTable extends Widget {
 
     private final JXTable _dataTable = new JXTable();
     private final JPanel _container = new JPanel();
+    private CSamplePropertyMatrix _dataMatrix;
 
     public WidgetSamplePropertyTable() {
         super("Sample Property Table", W_DATA, L_DATAPORT, UI.getImageIcon("grid"), null);
@@ -54,6 +56,8 @@ public class WidgetSamplePropertyTable extends Widget {
                 UI.colorKAMENOZOKI, null));
         _dataTable.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW,
                 null, UI.colorKARAKURENAI));
+        
+        _dataTable.setColumnModel(new CSamplePropertyTableColumnMode());
 
         JScrollPane scrollPane = new JScrollPane(_dataTable);
         getContentPane().setLayout(new BorderLayout());
@@ -78,12 +82,12 @@ public class WidgetSamplePropertyTable extends Widget {
                 dialog.setLocation(pt);
                 dialog.setLayout(new BorderLayout());
 
-                PropertyGroupSetting originalSetting = CoolMapMaster.getFirst().getGroupSettingForProperty(col - 1);
+                PropertyGroupSetting originalSetting = _dataMatrix.getGroupSettingForProperty(col - 1);
                 if (originalSetting == null) {
                     return;
                 }
                 if (originalSetting instanceof ContinuousPropertyGroupSetting) {
-                    
+
                     final ContinuousPropertyGroupSetting oldSetting = (ContinuousPropertyGroupSetting) originalSetting;
 
                     final JTextField editGroup = new JTextField();
@@ -102,16 +106,16 @@ public class WidgetSamplePropertyTable extends Widget {
 
                     JButton confirmEditButton = new JButton("Change");
                     dialog.add(confirmEditButton, BorderLayout.SOUTH);
-                    
+
                     confirmEditButton.addMouseListener(new MouseListener() {
 
                         @Override
                         public void mouseClicked(MouseEvent e) {
                             dialog.setVisible(false);
-                            
+
                             String changedString = editGroup.getText();
                             ArrayList<Double> newGroupList = new ArrayList<>();
-                            
+
                             String[] interResult = changedString.split(",");
                             for (int i = 0; i < interResult.length; ++i) {
                                 interResult[i] = interResult[i].trim();
@@ -119,13 +123,13 @@ public class WidgetSamplePropertyTable extends Widget {
                                     Double curValue = Double.parseDouble(interResult[i]);
                                     newGroupList.add(curValue);
                                 } catch (NumberFormatException ex) {
-                                }                              
+                                }
                             }
-                            
-                            String curPorpType = CoolMapMaster.getFirst().getPropType(col - 1);
+
+                            String curPorpType = _dataMatrix.getPropType(col - 1);
                             ContinuousPropertyGroupSetting newSetting = new ContinuousPropertyGroupSetting(curPorpType, oldSetting.getMin(), oldSetting.getMax());
                             newSetting.setWithMarks(newGroupList);
-                            CoolMapMaster.getFirst().setPropGroup(curPorpType, newSetting);
+                            _dataMatrix.setPropGroup(curPorpType, newSetting);
                         }
 
                         @Override
@@ -148,8 +152,6 @@ public class WidgetSamplePropertyTable extends Widget {
                             //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
                         }
                     });
-
-                    
 
                 } else {
 
@@ -271,7 +273,7 @@ public class WidgetSamplePropertyTable extends Widget {
 
                             }
 
-                            CoolMapMaster.getFirst().setCatePropGroup(col - 1, newSettings);
+                            _dataMatrix.setCatePropGroup(col - 1, newSettings);
 
                         }
 
@@ -310,7 +312,15 @@ public class WidgetSamplePropertyTable extends Widget {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                // check for reordering of cloumns everytime mouse released from the table header
+                // if reordering occurred, regenerate the ontology
+                ArrayList<String> newOrder = new ArrayList<>();
+
+                for (int i = 1; i < _dataTable.getColumnCount(); ++i) {
+                    newOrder.add(_dataTable.getColumnName(i));
+                }
+
+                _dataMatrix.setPropOrder(newOrder);
             }
 
             @Override
@@ -323,6 +333,7 @@ public class WidgetSamplePropertyTable extends Widget {
                 //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         });
+
     }
 
     private ArrayList<String> _generateNewData(ArrayList<String> data, int index, String changedString) {
@@ -416,7 +427,7 @@ public class WidgetSamplePropertyTable extends Widget {
 
         ArrayList<String> tableHeaders = new ArrayList<>();
 
-        ArrayList<String> properties = matrix.getPropNames();
+        ArrayList<String> properties = matrix.getPropOrder();
         tableHeaders.add("Samples");
         for (String propType : properties) {
             tableHeaders.add(propType);
@@ -445,17 +456,34 @@ public class WidgetSamplePropertyTable extends Widget {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                _dataMatrix = dataMatrix;
                 DefaultTableModel model = _getOntologyAsTableModel(dataMatrix);
                 _dataTable.setModel(model);
 
                 DefaultRowSorter sorter = (DefaultRowSorter) _dataTable.getRowSorter();
-                //sorter.setSortable(0, false);
 
                 for (int i = 1; i < model.getColumnCount(); ++i) {
                     sorter.setSortable(i, false);
                 }
+                
+                
             }
         });
+    }
+
+    /**
+     * rewrite the moveColumn method to prevent user moving the sample column or moving other columns to index 0
+     */
+    private class CSamplePropertyTableColumnMode extends DefaultTableColumnModel {
+
+        @Override
+        public void moveColumn(int columnIndex, int newIndex) {
+            if (columnIndex == 0 || newIndex == 0) {
+                return;
+            }
+            
+            super.moveColumn(columnIndex, newIndex);
+        }
     }
 
 }

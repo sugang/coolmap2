@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coolmap.data.contology.spmatrix;
+package coolmap.data.contology.model.spmatrix;
 
 import coolmap.application.CoolMapMaster;
 import coolmap.application.widget.impl.console.CMConsole;
@@ -232,8 +232,24 @@ public class CSamplePropertyMatrix {
         return _sampleNames;
     }
 
-    public ArrayList<String> getPropNames() {
+    public ArrayList<String> getPropOrder() {
         return _propOrder;
+    }
+
+    /**
+     * takes a new order of properties and apply it to current data matrix
+     * ontology regeneration takes place if the order is different from the original order
+     * @param newOrder the new order of the properties
+     */
+    public void setPropOrder(ArrayList<String> newOrder) {
+    
+        if (_propOrder == newOrder || _propOrder.equals(newOrder)) {
+            return;
+        }
+       
+        _propOrder.clear();
+        _propOrder.addAll(newOrder);
+        _setUp();
     }
 
     public COntology getOntology() {
@@ -405,7 +421,7 @@ public class CSamplePropertyMatrix {
     public PropertyGroupSetting getGroupSettingForProperty(String propType) {
         return _propGroupInfo.get(propType);
     }
-    
+
     public String getPropType(int index) {
         if (index < 0 || index > _propOrder.size() - 1) {
             return null;
