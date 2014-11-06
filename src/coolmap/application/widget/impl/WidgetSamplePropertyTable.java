@@ -6,7 +6,7 @@
 package coolmap.application.widget.impl;
 
 import coolmap.application.CoolMapMaster;
-import coolmap.application.io.actions.ImportPropertyGroupSettingFromOBOAction;
+import coolmap.application.io.actions.spmatrix.ImportPropertyGroupSettingFromOBOAction;
 import coolmap.application.widget.Widget;
 import coolmap.data.contology.model.spmatrix.CSamplePropertyMatrix;
 import coolmap.data.contology.model.spmatrix.CategorizedPropertyGroupSetting;

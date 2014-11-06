@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coolmap.application.io.actions;
+package coolmap.application.io.actions.spmatrix;
 
 import coolmap.application.CoolMapMaster;
 import coolmap.application.SamplePropertyMaster;

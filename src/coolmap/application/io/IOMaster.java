@@ -4,14 +4,11 @@
  */
 package coolmap.application.io;
 
-import coolmap.application.io.actions.MoveMultiPropertyAction;
 import coolmap.application.CoolMapMaster;
-import coolmap.application.io.actions.SwitchTwoPropertyAction;
 import coolmap.application.io.actions.ImportCOntologyGMTAction;
 import coolmap.application.io.actions.ImportCOntologySIFAction;
 import coolmap.application.io.actions.ImportDataTSVAction;
-import coolmap.application.io.actions.ImportSamplePropertyTableAction;
-import coolmap.application.io.actions.SetGroupSettingForProperty;
+import coolmap.application.io.actions.spmatrix.ImportSamplePropertyTableAction;
 import coolmap.application.io.internal.cmatrix.ICMatrixIO;
 import coolmap.application.io.internal.contology.PrivateCOntologyStructureFileIO;
 import coolmap.application.io.internal.coolmapobject.PrivateCoolMapObjectIO;
@@ -392,25 +389,6 @@ public class IOMaster {
         menuItem = new MenuItem("OBO Format");
         CoolMapMaster.getCMainFrame().addMenuItem("File/Import/Import ontology", menuItem, false, false);
         menuItem.addActionListener(new ImportPropertyGroupSettingFromOBOAction());*/
-
-        /*
-        
-        For test uses only, test the reflection from modification of sample property table to ontologies
-        --------------------------------------------------------------*********************test starts here****************----------------------------------------------------
-        */
-        menuItem = new MenuItem("switch 2 props");
-        CoolMapMaster.getCMainFrame().addMenuItem("File/Prop/", menuItem, false, false);
-        menuItem.addActionListener(new SwitchTwoPropertyAction());
-        
-        menuItem = new MenuItem("move multi props");
-        CoolMapMaster.getCMainFrame().addMenuItem("File/Prop/", menuItem, false, false);
-        menuItem.addActionListener(new MoveMultiPropertyAction());
-        
-        menuItem = new MenuItem("set groups for cat and cont");
-        CoolMapMaster.getCMainFrame().addMenuItem("File/Prop/", menuItem, false, false);
-        menuItem.addActionListener(new SetGroupSettingForProperty());
-        
-        // -------------------------------------------------------------********************* test ends here *************----------------------------------------------------
 
         menuItem = new MenuItem("view to TSV file");
 //        CoolMapMaster.getCMainFrame().addMenuItem("File/Export", menuItem, false, false);
