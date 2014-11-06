@@ -6,12 +6,13 @@
 package coolmap.application.io.actions;
 
 import coolmap.application.CoolMapMaster;
+import coolmap.application.SamplePropertyMaster;
 import coolmap.application.io.external.ImportOBOFromFile;
 import coolmap.application.utils.LongTask;
 import coolmap.application.utils.TaskEngine;
 import coolmap.application.widget.impl.console.CMConsole;
-import coolmap.data.contology.model.COntology;
 import coolmap.utils.Tools;
+import coolmap.utils.bioparser.simpleobo.SimpleOBOTree;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import javax.swing.AbstractAction;
@@ -22,10 +23,18 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  * @author Keqiang Li
  */
-public class ImportOBOOntologyAction extends AbstractAction{
-    public ImportOBOOntologyAction() {
+public class ImportPropertyGroupSettingFromOBOAction extends AbstractAction{
+    
+    private String _curPropString;
+    
+    public ImportPropertyGroupSettingFromOBOAction() {
         super("from OBO ontology file");
         putValue(javax.swing.AbstractAction.SHORT_DESCRIPTION, "import OBO ontology from .obo files");
+    }
+
+    public ImportPropertyGroupSettingFromOBOAction(String propType) {
+        super();
+        _curPropString = propType;
     }
 
     @Override
@@ -44,14 +53,18 @@ public class ImportOBOOntologyAction extends AbstractAction{
                 @Override
                 public void run() {
                     try {
-                        COntology ontology = ImportOBOFromFile.importOBOFromFile(f);
-                        if (ontology == null) {
+                        SimpleOBOTree oboTree = ImportOBOFromFile.importOBOFromFile(f);
+                        if (oboTree == null) {
                             return;
                         }
                         
-                        CoolMapMaster.addNewCOntology(ontology);
+                        boolean result = SamplePropertyMaster.applyOBOGroupSetting(oboTree, _curPropString);
 
-                        CMConsole.logInSuccess("OBO File imported and ontology generated " + f.getPath());
+                        if (result) {
+                            CMConsole.logInSuccess("OBO File imported and group settings applied " + f.getPath());
+                        } else {
+                            CMConsole.logInSuccess("OBO File imported and group settings applied " + f.getPath());
+                        }
                     } catch (Exception ex) {
                         CMConsole.logError("Error: failed to import OBO file from " + f.getName());
                     }

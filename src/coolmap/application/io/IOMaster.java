@@ -10,7 +10,6 @@ import coolmap.application.io.actions.SwitchTwoPropertyAction;
 import coolmap.application.io.actions.ImportCOntologyGMTAction;
 import coolmap.application.io.actions.ImportCOntologySIFAction;
 import coolmap.application.io.actions.ImportDataTSVAction;
-import coolmap.application.io.actions.ImportOBOOntologyAction;
 import coolmap.application.io.actions.ImportSamplePropertyTableAction;
 import coolmap.application.io.actions.SetGroupSettingForProperty;
 import coolmap.application.io.internal.cmatrix.ICMatrixIO;
@@ -389,9 +388,10 @@ public class IOMaster {
         CoolMapMaster.getCMainFrame().addMenuItem("File/Import", menuItem, false, false);
         menuItem.addActionListener(new ImportSamplePropertyTableAction());
         
+        /*
         menuItem = new MenuItem("OBO Format");
         CoolMapMaster.getCMainFrame().addMenuItem("File/Import/Import ontology", menuItem, false, false);
-        menuItem.addActionListener(new ImportOBOOntologyAction());
+        menuItem.addActionListener(new ImportPropertyGroupSettingFromOBOAction());*/
 
         /*
         

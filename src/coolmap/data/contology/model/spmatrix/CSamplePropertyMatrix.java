@@ -428,4 +428,23 @@ public class CSamplePropertyMatrix {
         }
         return _propOrder.get(index);
     }
+    
+    public boolean isCategorizedProp(int index) {
+        String propType = _propOrder.get(index);
+        return isCategorizedProp(propType);
+    }
+    
+    public boolean isCategorizedProp(String propType) {
+        if (_propContinuity.containsKey(propType)) {
+            String continuity = _propContinuity.get(propType);
+            switch(continuity) {
+                case PROPERTY_CONTINUITY_CONTINUOUS:
+                    return false;
+                case PROPERTY_CONTINUITY_CATEGORIZED:
+                    return true;
+            }
+        }
+        
+        return false;
+    }
 }

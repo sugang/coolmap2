@@ -8,6 +8,9 @@ package coolmap.application;
 import coolmap.application.widget.WidgetMaster;
 import coolmap.application.widget.impl.WidgetSamplePropertyTable;
 import coolmap.data.contology.model.spmatrix.CSamplePropertyMatrix;
+import coolmap.utils.bioparser.simpleobo.SimpleOBOTree;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -28,6 +31,7 @@ public class SamplePropertyMaster {
             CoolMapMaster.addNewCOntology(samplePropertyMatrix.getOntology());
         }
         samplePropertyMatrix.setIsAdded(true);
+        updateSamplePropertyWidget(samplePropertyMatrix);
     }
 
     public static void removeSamplePropertyMatrix(CSamplePropertyMatrix samplePropertyMatrix) {
@@ -59,6 +63,24 @@ public class SamplePropertyMaster {
         WidgetSamplePropertyTable samplePropertyWidget = (WidgetSamplePropertyTable) WidgetMaster.getWidget(widgetName);
 
         samplePropertyWidget.updateTable(matrix);
+    }
+
+    public static boolean applyOBOGroupSetting(SimpleOBOTree oboTree, String _curPropString) {
+
+        Set<String> allParents = oboTree.getParentNodeIDs();
+        ArrayList<HashSet> groupsList = new ArrayList<>();
+        for (String parent : allParents) {
+            String[] allElements = parent.split(",");
+            // use get parents
+            HashSet<String> newGroup = new HashSet<>();
+            for (int i = 0; i < allElements.length; ++i) {
+                newGroup.add(allElements[i].trim());
+            }
+            groupsList.add(newGroup);
+        }
+
+        return getFirst().setCatePropGroup(_curPropString, groupsList);
+
     }
 
 }

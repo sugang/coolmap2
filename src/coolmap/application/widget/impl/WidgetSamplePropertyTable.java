@@ -6,6 +6,7 @@
 package coolmap.application.widget.impl;
 
 import coolmap.application.CoolMapMaster;
+import coolmap.application.io.actions.ImportPropertyGroupSettingFromOBOAction;
 import coolmap.application.widget.Widget;
 import coolmap.data.contology.model.spmatrix.CSamplePropertyMatrix;
 import coolmap.data.contology.model.spmatrix.CategorizedPropertyGroupSetting;
@@ -16,8 +17,10 @@ import coolmap.utils.graphics.UI;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,13 +28,16 @@ import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -46,6 +52,7 @@ public class WidgetSamplePropertyTable extends Widget {
 
     private final JXTable _dataTable = new JXTable();
     private final JPanel _container = new JPanel();
+    private final JTableHeader _tableHeader = _dataTable.getTableHeader();
     private CSamplePropertyMatrix _dataMatrix;
 
     public WidgetSamplePropertyTable() {
@@ -56,7 +63,7 @@ public class WidgetSamplePropertyTable extends Widget {
                 UI.colorKAMENOZOKI, null));
         _dataTable.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW,
                 null, UI.colorKARAKURENAI));
-        
+
         _dataTable.setColumnModel(new CSamplePropertyTableColumnMode());
 
         JScrollPane scrollPane = new JScrollPane(_dataTable);
@@ -66,248 +73,191 @@ public class WidgetSamplePropertyTable extends Widget {
 
         _container.add(scrollPane);
 
-        // when the header is double clicked, show dialog to let user set group for properties
-        _dataTable.getTableHeader().addMouseListener(new MouseListener() {
-
+        _tableHeader.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                Point pt = e.getPoint();
+            public void mouseClicked(MouseEvent headerClickEvent) {
+                // only response for right click
+                if (!SwingUtilities.isRightMouseButton(headerClickEvent)) {
+                    return;
+                }
+                
+                // get where the click happens
+                final Point pt = headerClickEvent.getPoint();
+                //get on which column user has clicked
                 final int col = _dataTable.columnAtPoint(pt);
-                if (e.getClickCount() != 2 || col <= 0) {
+
+                // do nothing when user clicks on the first column's header
+                if (col <= 0) {
                     return;
                 }
 
-                // create a dialog to let user set group info
-                final JDialog dialog = new JDialog(CoolMapMaster.getCMainFrame(), "Customize Groups");
-                dialog.setLocation(pt);
-                dialog.setLayout(new BorderLayout());
-
-                PropertyGroupSetting originalSetting = _dataMatrix.getGroupSettingForProperty(col - 1);
-                if (originalSetting == null) {
-                    return;
+                // pop up a menu for user to choose what action to perform
+                JPopupMenu tableHeaderPopupMenu = new JPopupMenu();
+                
+                boolean isCategorizedProp = _dataMatrix.isCategorizedProp(col - 1);
+                
+                if (isCategorizedProp) {
+                    JMenuItem importGroupItem = new JMenuItem(new ImportPropertyGroupSettingFromOBOAction(_dataMatrix.getPropType(col - 1)));
+                    importGroupItem.setText("Import Group Setting from OBO File");
+                    tableHeaderPopupMenu.add(importGroupItem);
                 }
-                if (originalSetting instanceof ContinuousPropertyGroupSetting) {
 
-                    final ContinuousPropertyGroupSetting oldSetting = (ContinuousPropertyGroupSetting) originalSetting;
+                JMenuItem editGroupItem = new JMenuItem("Edit Group");              
 
-                    final JTextField editGroup = new JTextField();
-                    JTextField minValueField = new JTextField("" + oldSetting.getMin() + ",");
-                    JTextField maxValueField = new JTextField("," + oldSetting.getMax());
-                    minValueField.setEditable(false);
-                    maxValueField.setEditable(false);
+                tableHeaderPopupMenu.add(editGroupItem);
 
-                    dialog.add(minValueField, BorderLayout.WEST);
-                    dialog.add(maxValueField, BorderLayout.EAST);
-                    dialog.add(editGroup, BorderLayout.CENTER);
+                tableHeaderPopupMenu.show(_tableHeader, headerClickEvent.getX(), headerClickEvent.getY());
 
-                    dialog.setLocation(e.getPoint());
-                    dialog.setSize(300, 100);
-                    dialog.setVisible(true);
+                editGroupItem.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
 
-                    JButton confirmEditButton = new JButton("Change");
-                    dialog.add(confirmEditButton, BorderLayout.SOUTH);
+                        // create a dialog to let user set group info
+                        final JDialog dialog = new JDialog(CoolMapMaster.getCMainFrame(), "Customize Groups");
 
-                    confirmEditButton.addMouseListener(new MouseListener() {
+                        dialog.setLocation(pt);
+                        dialog.setLayout(new BorderLayout());
 
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            dialog.setVisible(false);
-
-                            String changedString = editGroup.getText();
-                            ArrayList<Double> newGroupList = new ArrayList<>();
-
-                            String[] interResult = changedString.split(",");
-                            for (int i = 0; i < interResult.length; ++i) {
-                                interResult[i] = interResult[i].trim();
-                                try {
-                                    Double curValue = Double.parseDouble(interResult[i]);
-                                    newGroupList.add(curValue);
-                                } catch (NumberFormatException ex) {
-                                }
-                            }
-
-                            String curPorpType = _dataMatrix.getPropType(col - 1);
-                            ContinuousPropertyGroupSetting newSetting = new ContinuousPropertyGroupSetting(curPorpType, oldSetting.getMin(), oldSetting.getMax());
-                            newSetting.setWithMarks(newGroupList);
-                            _dataMatrix.setPropGroup(curPorpType, newSetting);
+                        PropertyGroupSetting originalSetting = _dataMatrix.getGroupSettingForProperty(col - 1);
+                        // no default settings found, should never happen
+                        if (originalSetting == null) {
+                            return;
                         }
+                        if (originalSetting instanceof ContinuousPropertyGroupSetting) {
 
-                        @Override
-                        public void mousePressed(MouseEvent e) {
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
+                            final ContinuousPropertyGroupSetting oldSetting = (ContinuousPropertyGroupSetting) originalSetting;
 
-                        @Override
-                        public void mouseReleased(MouseEvent e) {
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
+                            final JTextField editGroup = new JTextField();
+                            JTextField minValueField = new JTextField("" + oldSetting.getMin() + ",");
+                            JTextField maxValueField = new JTextField("," + oldSetting.getMax());
+                            minValueField.setEditable(false);
+                            maxValueField.setEditable(false);
 
-                        @Override
-                        public void mouseEntered(MouseEvent e) {
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
+                            dialog.add(minValueField, BorderLayout.WEST);
+                            dialog.add(maxValueField, BorderLayout.EAST);
+                            dialog.add(editGroup, BorderLayout.CENTER);
 
-                        @Override
-                        public void mouseExited(MouseEvent e) {
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
-                    });
-
-                } else {
-
-                    CategorizedPropertyGroupSetting setting = (CategorizedPropertyGroupSetting) originalSetting;
-                    ArrayList<SamplePropertyGroup> groups = setting.getGroups();
-
-                    final ArrayList<String> data = new ArrayList<>();
-                    //Object data[][] = new Object[groups.size()][1];
-
-                    for (int i = 0; i < groups.size(); ++i) {
-                        data.add(groups.get(i).customizedName);
-                    }
-
-                    final JList list = new JList(data.toArray());
-
-                    list.addMouseListener(new MouseListener() {
-
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-
-                            final int index = list.getSelectedIndex();
-                            if (e.getClickCount() != 2) {
-                                return;
-                            }
-
-                            final JDialog editDialog = new JDialog(dialog, "Modifying Group");
-                            final JTextField editGroup = new JTextField(data.get(index));
-
-                            editDialog.setLayout(new BorderLayout());
-                            editDialog.add(editGroup, BorderLayout.NORTH);
-
-                            editDialog.setLocation(e.getPoint());
-                            editDialog.setSize(200, 100);
-                            editDialog.setVisible(true);
+                            dialog.setSize(300, 100);
+                            dialog.setVisible(true);
 
                             JButton confirmEditButton = new JButton("Change");
-                            editDialog.add(confirmEditButton, BorderLayout.SOUTH);
+                            dialog.add(confirmEditButton, BorderLayout.SOUTH);
 
-                            confirmEditButton.addMouseListener(new MouseListener() {
+                            confirmEditButton.addMouseListener(new MouseAdapter() {
 
                                 @Override
                                 public void mouseClicked(MouseEvent e) {
-                                    editDialog.setVisible(false);
+                                    dialog.setVisible(false);
+
                                     String changedString = editGroup.getText();
-                                    ArrayList<String> newData = _generateNewData(data, index, changedString);
+                                    ArrayList<Double> newGroupList = new ArrayList<>();
 
-                                    data.clear();
-                                    data.addAll(newData);
-                                    list.setListData(data.toArray());
-                                }
+                                    String[] interResult = changedString.split(",");
+                                    for (int i = 0; i < interResult.length; ++i) {
+                                        interResult[i] = interResult[i].trim();
+                                        try {
+                                            Double curValue = Double.parseDouble(interResult[i]);
+                                            newGroupList.add(curValue);
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                    }
 
-                                @Override
-                                public void mousePressed(MouseEvent e) {
-                                    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                                }
-
-                                @Override
-                                public void mouseReleased(MouseEvent e) {
-                                    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                                }
-
-                                @Override
-                                public void mouseEntered(MouseEvent e) {
-                                    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                                }
-
-                                @Override
-                                public void mouseExited(MouseEvent e) {
-                                    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                                    String curPorpType = _dataMatrix.getPropType(col - 1);
+                                    ContinuousPropertyGroupSetting newSetting = new ContinuousPropertyGroupSetting(curPorpType, oldSetting.getMin(), oldSetting.getMax());
+                                    newSetting.setWithMarks(newGroupList);
+                                    _dataMatrix.setPropGroup(curPorpType, newSetting);
                                 }
                             });
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
 
-                        @Override
-                        public void mousePressed(MouseEvent e) {
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
+                        } else {
 
-                        @Override
-                        public void mouseReleased(MouseEvent e) {
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
+                            CategorizedPropertyGroupSetting setting = (CategorizedPropertyGroupSetting) originalSetting;
+                            ArrayList<SamplePropertyGroup> groups = setting.getGroups();
 
-                        @Override
-                        public void mouseEntered(MouseEvent e) {
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
+                            final ArrayList<String> data = new ArrayList<>();
+                            //Object data[][] = new Object[groups.size()][1];
 
-                        @Override
-                        public void mouseExited(MouseEvent e) {
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
-                    });
-
-                    JPanel panel = new JPanel(new BorderLayout());
-                    JScrollPane scrollPane1 = new JScrollPane(list);
-
-                    panel.add(scrollPane1, BorderLayout.NORTH);
-                    //dialog.pack();
-                    Dimension d = new Dimension(300, 200);
-                    dialog.setSize(d);
-                    dialog.add(panel);
-
-                    JButton confirmButton = new JButton("Confirm");
-
-                    panel.add(confirmButton, BorderLayout.SOUTH);
-
-                    confirmButton.addMouseListener(new MouseListener() {
-
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            dialog.setVisible(false);
-
-                            ArrayList<HashSet> newSettings = new ArrayList<>();
-
-                            for (int i = 0; i < data.size(); ++i) {
-                                newSettings.add(_convertStringToHashSet(data.get(i)));
-
+                            for (int i = 0; i < groups.size(); ++i) {
+                                data.add(groups.get(i).customizedName);
                             }
 
-                            _dataMatrix.setCatePropGroup(col - 1, newSettings);
+                            final JList list = new JList(data.toArray());
 
+                            list.addMouseListener(new MouseAdapter() {
+
+                                @Override
+                                public void mouseClicked(MouseEvent e) {
+
+                                    final int index = list.getSelectedIndex();
+                                    if (e.getClickCount() != 2) {
+                                        return;
+                                    }
+
+                                    final JDialog editDialog = new JDialog(dialog, "Modifying Group");
+                                    final JTextField editGroup = new JTextField(data.get(index));
+
+                                    editDialog.setLayout(new BorderLayout());
+                                    editDialog.add(editGroup, BorderLayout.NORTH);
+
+                                    editDialog.setLocation(e.getPoint());
+                                    editDialog.setSize(200, 100);
+                                    editDialog.setVisible(true);
+
+                                    JButton confirmEditButton = new JButton("Change");
+                                    editDialog.add(confirmEditButton, BorderLayout.SOUTH);
+
+                                    confirmEditButton.addMouseListener(new MouseAdapter() {
+
+                                        @Override
+                                        public void mouseClicked(MouseEvent e) {
+                                            editDialog.setVisible(false);
+                                            String changedString = editGroup.getText();
+                                            ArrayList<String> newData = _generateNewData(data, index, changedString);
+
+                                            data.clear();
+                                            data.addAll(newData);
+                                            list.setListData(data.toArray());
+                                        }
+                                    });
+                                }
+
+                            });
+
+                            JPanel panel = new JPanel(new BorderLayout());
+                            JScrollPane scrollPane1 = new JScrollPane(list);
+
+                            panel.add(scrollPane1, BorderLayout.NORTH);
+                            Dimension d = new Dimension(300, 200);
+                            dialog.setSize(d);
+                            dialog.add(panel);
+
+                            JButton confirmButton = new JButton("Confirm");
+
+                            panel.add(confirmButton, BorderLayout.SOUTH);
+
+                            confirmButton.addMouseListener(new MouseAdapter() {
+
+                                @Override
+                                public void mouseClicked(MouseEvent e) {
+                                    dialog.setVisible(false);
+
+                                    ArrayList<HashSet> newSettings = new ArrayList<>();
+
+                                    for (int i = 0; i < data.size(); ++i) {
+                                        newSettings.add(_convertStringToHashSet(data.get(i)));
+
+                                    }
+
+                                    _dataMatrix.setCatePropGroup(col - 1, newSettings);
+
+                                }
+
+                            });
                         }
 
-                        @Override
-                        public void mousePressed(MouseEvent e) {
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
-
-                        @Override
-                        public void mouseReleased(MouseEvent e) {
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
-
-                        @Override
-                        public void mouseEntered(MouseEvent e) {
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
-
-                        @Override
-                        public void mouseExited(MouseEvent e) {
-                            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
-                    });
-                }
-
-                //dialog.set
-                dialog.setVisible(true);
-                // CoolMapMaster.lookupPropertyAtIndex(col);
-
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        dialog.setVisible(true);
+                    }
+                });
             }
 
             @Override
@@ -323,15 +273,6 @@ public class WidgetSamplePropertyTable extends Widget {
                 _dataMatrix.setPropOrder(newOrder);
             }
 
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
         });
 
     }
@@ -384,6 +325,7 @@ public class WidgetSamplePropertyTable extends Widget {
         }
 
         return newGroup;
+
     }
 
     private class DataTableModel extends DefaultTableModel {
@@ -465,14 +407,15 @@ public class WidgetSamplePropertyTable extends Widget {
                 for (int i = 1; i < model.getColumnCount(); ++i) {
                     sorter.setSortable(i, false);
                 }
-                
-                
+
             }
         });
+
     }
 
     /**
-     * rewrite the moveColumn method to prevent user moving the sample column or moving other columns to index 0
+     * rewrite the moveColumn method to prevent user moving the sample column or
+     * moving other columns to index 0
      */
     private class CSamplePropertyTableColumnMode extends DefaultTableColumnModel {
 
@@ -481,7 +424,7 @@ public class WidgetSamplePropertyTable extends Widget {
             if (columnIndex == 0 || newIndex == 0) {
                 return;
             }
-            
+
             super.moveColumn(columnIndex, newIndex);
         }
     }

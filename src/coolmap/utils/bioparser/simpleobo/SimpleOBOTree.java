@@ -5,7 +5,6 @@
 package coolmap.utils.bioparser.simpleobo;
 
 import com.google.common.collect.HashMultimap;
-import coolmap.data.contology.model.COntology;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +22,6 @@ public class SimpleOBOTree {
 
     private HashMultimap<String, String> goTree = HashMultimap.create();
     private HashMap<String, SimpleOBOEntry> goTermHash = new HashMap<>();
-    
-    public COntology ontology;
 
     public void addEntry(SimpleOBOEntry entry) {
         goTermHash.put(entry.getID(), entry);
@@ -50,7 +47,6 @@ public class SimpleOBOTree {
                     simpleOboTree.addEntry(currentEntry); //if it's not null, add a new entry
                     currentEntry = null;
                 }
-                continue;
             } else if (line.startsWith("[Term]")) {
                 currentEntry = new SimpleOBOEntry();
                 //
@@ -61,26 +57,18 @@ public class SimpleOBOTree {
                     //try{
                     currentChildTerm = line.substring(4);
                     currentEntry.setID(currentChildTerm);
-                    //}
-                    //catch(Exception e){
-                    //    System.out.println(line);
-                    //}
-                    continue;
                 } else if (line.startsWith("name:")) {
                     //the current entry must not be null
                     currentEntry.setName(line.substring(6));
-                    continue;
                 } else if (line.startsWith("namespace:")) {
                     //the current entry must not be null
                     currentEntry.setNamespace(line.substring(11));
-                    continue;
                 } else if (line.startsWith("is_a:")) {
                     //the current entry must not be null
                     line = line.substring(6);
                     line = line.substring(0, line.indexOf(" "));
                     simpleOboTree.addTreeBranch(line, currentChildTerm);
                     currentEntry.addParent(line);
-                    continue;
                 } else {
                     //add attributes
 
@@ -97,6 +85,10 @@ public class SimpleOBOTree {
         return simpleOboTree;
     }
     
+    /**
+     * @author Keqiang Li. In order not to affect the previous usage of parse, copy and modify the original parse method here
+     * 
+     */
      public static SimpleOBOTree parse1(String name, InputStream in) throws IOException {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -104,7 +96,7 @@ public class SimpleOBOTree {
         SimpleOBOEntry currentEntry = null;
         String currentChildTerm = null;
         SimpleOBOTree simpleOboTree = new SimpleOBOTree();
-        simpleOboTree.ontology = new COntology(name, "parsed ontology");
+        //simpleOboTree.ontology = new COntology(name, "parsed ontology");
 
         while ((line = reader.readLine()) != null) {
             line = line.trim();
@@ -114,7 +106,6 @@ public class SimpleOBOTree {
                     simpleOboTree.addEntry(currentEntry); //if it's not null, add a new entry
                     currentEntry = null;
                 }
-                continue;
             } else if (line.startsWith("[Term]")) {
                 currentEntry = new SimpleOBOEntry();
                 //
@@ -125,27 +116,19 @@ public class SimpleOBOTree {
                     //try{
                     currentChildTerm = line.substring(3);
                     currentEntry.setID(currentChildTerm);
-                    //}
-                    //catch(Exception e){
-                    //    System.out.println(line);
-                    //}
-                    continue;
                 } else if (line.startsWith("name:")) {
                     //the current entry must not be null
                     currentEntry.setName(line.substring(5));
-                    continue;
                 } else if (line.startsWith("namespace:")) {
                     //the current entry must not be null
                     currentEntry.setNamespace(line.substring(10));
-                    continue;
                 } else if (line.startsWith("is_a:")) {
                     //the current entry must not be null
                     line = line.substring(5);
                     //line = line.substring(0, line.indexOf(" "));
                     simpleOboTree.addTreeBranch(line, currentChildTerm);
                     currentEntry.addParent(line);
-                    simpleOboTree.ontology.addRelationshipNoUpdateDepth(line, currentChildTerm);
-                    continue;
+                    //simpleOboTree.ontology.addRelationshipNoUpdateDepth(line, currentChildTerm);
                 } else {
                     //add attributes
 
@@ -159,7 +142,7 @@ public class SimpleOBOTree {
             }
         }
 
-        simpleOboTree.ontology.validate();
+        //simpleOboTree.ontology.validate();
         return simpleOboTree;
     }
     
@@ -210,8 +193,4 @@ public class SimpleOBOTree {
         entries.addAll(goTermHash.values());
         return entries;
     }
-    
-    
-    
-    
 }
