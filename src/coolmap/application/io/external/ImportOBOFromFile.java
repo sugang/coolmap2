@@ -17,9 +17,15 @@ import java.io.IOException;
  */
 public class ImportOBOFromFile {
     
-    public static SimpleOBOTree importOBOFromFile(File f) throws IOException {
+    public static SimpleOBOTree importOBOGroupSettingFromFile(File f) throws IOException {
         SimpleOBOTree oboTree = SimpleOBOTree.parse1(f.getName(), new FileInputStream(f));
         
         return oboTree;
-    }  
+    }
+    
+    public static COntology importOBOFromFile(File f) throws IOException {
+        SimpleOBOTree oboTree = SimpleOBOTree.parse1(f.getName(), new FileInputStream(f));
+        
+        return oboTree.ontology;
+    }
 }

@@ -5,6 +5,7 @@
 package coolmap.utils.bioparser.simpleobo;
 
 import com.google.common.collect.HashMultimap;
+import coolmap.data.contology.model.COntology;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +21,9 @@ import java.util.Set;
  */
 public class SimpleOBOTree {
 
-    private HashMultimap<String, String> goTree = HashMultimap.create();
-    private HashMap<String, SimpleOBOEntry> goTermHash = new HashMap<>();
+    private final HashMultimap<String, String> goTree = HashMultimap.create();
+    private final HashMap<String, SimpleOBOEntry> goTermHash = new HashMap<>();
+    public COntology ontology;
 
     public void addEntry(SimpleOBOEntry entry) {
         goTermHash.put(entry.getID(), entry);
@@ -34,7 +36,7 @@ public class SimpleOBOTree {
     public static SimpleOBOTree parse(String name, InputStream in) throws IOException {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String line = null;
+        String line;
         SimpleOBOEntry currentEntry = null;
         String currentChildTerm = null;
         SimpleOBOTree simpleOboTree = new SimpleOBOTree();
@@ -87,16 +89,20 @@ public class SimpleOBOTree {
     
     /**
      * @author Keqiang Li. In order not to affect the previous usage of parse, copy and modify the original parse method here
+     * @param name name for the imported ontology
+     * @param in the input stream from the OBO file
+     * @return the imported OBO file as a tree
+     * @throws java.io.IOException 
      * 
      */
      public static SimpleOBOTree parse1(String name, InputStream in) throws IOException {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String line = null;
+        String line;
         SimpleOBOEntry currentEntry = null;
         String currentChildTerm = null;
         SimpleOBOTree simpleOboTree = new SimpleOBOTree();
-        //simpleOboTree.ontology = new COntology(name, "parsed ontology");
+        simpleOboTree.ontology = new COntology(name, "parsed ontology");
 
         while ((line = reader.readLine()) != null) {
             line = line.trim();
@@ -128,11 +134,8 @@ public class SimpleOBOTree {
                     //line = line.substring(0, line.indexOf(" "));
                     simpleOboTree.addTreeBranch(line, currentChildTerm);
                     currentEntry.addParent(line);
-                    //simpleOboTree.ontology.addRelationshipNoUpdateDepth(line, currentChildTerm);
+                    simpleOboTree.ontology.addRelationshipNoUpdateDepth(line, currentChildTerm);
                 } else {
-                    //add attributes
-
-                    //System.out.println(line);
 
                     String ele[] = line.split(": ", 2); //why limit is 2?
                     currentEntry.addAttribute(ele[0], ele[1]);

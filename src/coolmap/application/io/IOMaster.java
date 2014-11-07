@@ -8,6 +8,7 @@ import coolmap.application.CoolMapMaster;
 import coolmap.application.io.actions.ImportCOntologyGMTAction;
 import coolmap.application.io.actions.ImportCOntologySIFAction;
 import coolmap.application.io.actions.ImportDataTSVAction;
+import coolmap.application.io.actions.spmatrix.ImportOBOAction;
 import coolmap.application.io.actions.spmatrix.ImportSamplePropertyTableAction;
 import coolmap.application.io.internal.cmatrix.ICMatrixIO;
 import coolmap.application.io.internal.contology.PrivateCOntologyStructureFileIO;
@@ -98,7 +99,7 @@ public class IOMaster {
                     }
 
                     File projectInfoFile = new File(projectDirectory.getAbsolutePath() + File.separator + IOTerm.FILE_PROJECT_INFO);
-                    String line = null;
+                    String line;
                     StringBuilder sb = new StringBuilder();
                     BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile));
                     while ((line = reader.readLine()) != null) {
@@ -239,7 +240,7 @@ public class IOMaster {
 
 
                         JSONArray cmatrixIDs = entry.optJSONArray(IOTerm.FIELD_COOLMAPOBJECT_LINKEDCMATRICES);
-                        ArrayList<CMatrix> matrices = new ArrayList<CMatrix>();
+                        ArrayList<CMatrix> matrices = new ArrayList<>();
                         for (int i = 0; i < cmatrixIDs.length(); i++) {
                             String cmatrixID = cmatrixIDs.getString(i);
                             CMatrix matrix = CoolMapMaster.getCMatrixByID(cmatrixID);
@@ -385,10 +386,10 @@ public class IOMaster {
         CoolMapMaster.getCMainFrame().addMenuItem("File/Import", menuItem, false, false);
         menuItem.addActionListener(new ImportSamplePropertyTableAction());
         
-        /*
+        
         menuItem = new MenuItem("OBO Format");
         CoolMapMaster.getCMainFrame().addMenuItem("File/Import/Import ontology", menuItem, false, false);
-        menuItem.addActionListener(new ImportPropertyGroupSettingFromOBOAction());*/
+        menuItem.addActionListener(new ImportOBOAction());
 
         menuItem = new MenuItem("view to TSV file");
 //        CoolMapMaster.getCMainFrame().addMenuItem("File/Export", menuItem, false, false);

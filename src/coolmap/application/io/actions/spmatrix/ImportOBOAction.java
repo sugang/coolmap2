@@ -6,13 +6,12 @@
 package coolmap.application.io.actions.spmatrix;
 
 import coolmap.application.CoolMapMaster;
-import coolmap.application.SamplePropertyMaster;
 import coolmap.application.io.external.ImportOBOFromFile;
 import coolmap.application.utils.LongTask;
 import coolmap.application.utils.TaskEngine;
 import coolmap.application.widget.impl.console.CMConsole;
+import coolmap.data.contology.model.COntology;
 import coolmap.utils.Tools;
-import coolmap.utils.bioparser.simpleobo.SimpleOBOTree;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import javax.swing.AbstractAction;
@@ -23,18 +22,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  * @author Keqiang Li
  */
-public class ImportPropertyGroupSettingFromOBOAction extends AbstractAction{
+public class ImportOBOAction extends AbstractAction{
     
-    private String _curPropString;
-    
-    public ImportPropertyGroupSettingFromOBOAction() {
-        super("from OBO group setting file");
-        putValue(javax.swing.AbstractAction.SHORT_DESCRIPTION, "import OBO group setting from .obo files");
-    }
-
-    public ImportPropertyGroupSettingFromOBOAction(String propType) {
-        super();
-        _curPropString = propType;
+    public ImportOBOAction() {
+        super("from OBO ontology file");
+        putValue(javax.swing.AbstractAction.SHORT_DESCRIPTION, "import OBO ontology from .obo files");
     }
 
     @Override
@@ -52,20 +44,15 @@ public class ImportPropertyGroupSettingFromOBOAction extends AbstractAction{
                 @Override
                 public void run() {
                     try {
-                        SimpleOBOTree oboTree = ImportOBOFromFile.importOBOGroupSettingFromFile(f);
-                        if (oboTree == null) {
+                        COntology ontology = ImportOBOFromFile.importOBOFromFile(f);
+                        if (ontology == null) {
                             return;
                         }
                         
-                        boolean result = SamplePropertyMaster.applyOBOGroupSetting(oboTree, _curPropString);
-
-                        if (result) {
-                            CMConsole.logInSuccess("OBO File imported and group settings applied " + f.getPath());
-                        } else {
-                            CMConsole.logError("Error: Failed to import OBO File group setting " + f.getPath());
-                        }
+                        CoolMapMaster.addNewCOntology(ontology);
+                        CMConsole.logInSuccess("OBO ontology imported " + f.getPath());
                     } catch (Exception ex) {
-                        CMConsole.logError("Error: failed to import OBO file from " + f.getName());
+                        CMConsole.logError("Error: failed to import OBO ontology from " + f.getName());
                     }
                 }
             };
