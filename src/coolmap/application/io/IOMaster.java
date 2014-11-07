@@ -8,7 +8,7 @@ import coolmap.application.CoolMapMaster;
 import coolmap.application.io.actions.ImportCOntologyGMTAction;
 import coolmap.application.io.actions.ImportCOntologySIFAction;
 import coolmap.application.io.actions.ImportDataTSVAction;
-import coolmap.application.io.actions.spmatrix.ImportOBOAction;
+import coolmap.application.io.actions.ImportOBOAction;
 import coolmap.application.io.actions.spmatrix.ImportSamplePropertyTableAction;
 import coolmap.application.io.internal.cmatrix.ICMatrixIO;
 import coolmap.application.io.internal.contology.PrivateCOntologyStructureFileIO;
@@ -382,7 +382,7 @@ public class IOMaster {
         CoolMapMaster.getCMainFrame().addMenuItem("File/Import/Import ontology", menuItem, false, false);
         menuItem.addActionListener(new ImportCOntologyGMTAction());
         
-        menuItem = new MenuItem("Sample-property table file");
+        menuItem = new MenuItem("Sample property table file");
         CoolMapMaster.getCMainFrame().addMenuItem("File/Import", menuItem, false, false);
         menuItem.addActionListener(new ImportSamplePropertyTableAction());
         

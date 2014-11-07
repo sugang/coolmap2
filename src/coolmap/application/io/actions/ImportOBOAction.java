@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coolmap.application.io.actions.spmatrix;
+package coolmap.application.io.actions;
 
 import coolmap.application.CoolMapMaster;
 import coolmap.application.io.external.ImportOBOFromFile;

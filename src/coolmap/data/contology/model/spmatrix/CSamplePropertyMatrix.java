@@ -415,7 +415,6 @@ public class CSamplePropertyMatrix {
         }
         String propType = _propOrder.get(col);
         return getGroupSettingForProperty(propType);
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     public PropertyGroupSetting getGroupSettingForProperty(String propType) {

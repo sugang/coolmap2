@@ -20,7 +20,7 @@ import java.util.Set;
 public class COntologyAttribute {
 
     private final HashBasedTable<String, String, Object> _nodeAttrTable = HashBasedTable.create();
-    private final HashMap<String, Class> _nodeAttrClassMap = new HashMap<String, Class>();
+    private final HashMap<String, Class> _nodeAttrClassMap = new HashMap<>();
 
     public void addAttribute(String nodeString, String attributeString, Object attribute) {
         _nodeAttrTable.put(nodeString, attributeString, attribute);

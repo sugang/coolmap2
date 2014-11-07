@@ -21,8 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class COntologyToCMatrixMap {
 
     private final COntology _cOntology;
-    private final ConcurrentHashMap<ItemKey, HashMap<String, Integer[]>> _baseIndexMaps = new ConcurrentHashMap<ItemKey, HashMap<String, Integer[]>>();
-    private final ConcurrentHashMap<String, Integer[]> _tempBaseMap = new ConcurrentHashMap<String, Integer[]>();
+    private final ConcurrentHashMap<ItemKey, HashMap<String, Integer[]>> _baseIndexMaps = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Integer[]> _tempBaseMap = new ConcurrentHashMap<>();
 
     public void clear(){
         _baseIndexMaps.clear();
