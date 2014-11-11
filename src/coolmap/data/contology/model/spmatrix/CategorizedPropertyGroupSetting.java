@@ -5,8 +5,11 @@
  */
 package coolmap.data.contology.model.spmatrix;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import com.google.common.collect.HashMultimap;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
 
 /**
  *
@@ -14,26 +17,66 @@ import java.util.HashSet;
  */
 public class CategorizedPropertyGroupSetting extends PropertyGroupSetting {
 
-    private final HashSet<String> _allValues;
+    // stores all the parent-children relations
 
-    public CategorizedPropertyGroupSetting(String propType, HashSet<String> allValues) {
+    private final HashMultimap<String, String> _groupTree = HashMultimap.create();
+    private final HashMap<String, CategorizedSamplePropertyGroup> _groups = new HashMap<>();
+
+    public CategorizedPropertyGroupSetting(String propType) {
         super(propType);
-        this._allValues = allValues;
     }
 
-    public boolean setWithSets(ArrayList<HashSet> sets) {
-        ArrayList<SamplePropertyGroup> newGroups = new ArrayList<>();
+    // add a branch starting from a parent to children
+    public void addGroupBranch(String parentGroupID, String childGroupID) {
+        _groupTree.put(parentGroupID, childGroupID);
+    }
 
-        for (HashSet set : sets) {
-            if (!_allValues.containsAll(set)) {
-                return false;
+    /**
+     * @author Keqiang Li.
+     * @param propType to which property the settings will be applied 
+     * @param in the input stream from the OBO file
+     * @return the imported OBO file as a tree
+     *
+     */
+    public static CategorizedPropertyGroupSetting importGroupSettingFromOBOFile(String propType, InputStream in) {
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+        CategorizedSamplePropertyGroup currentGroup = null;
+        CategorizedPropertyGroupSetting groupSetting = new CategorizedPropertyGroupSetting(propType);
+
+        String line;
+        String currentChildTerm = null;
+        
+        try {
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.length() == 0) {
+                    if (currentGroup != null) {
+                        groupSetting.addGroup(currentGroup); //if it's not null, add a new entry
+                        currentGroup = null;
+                    }
+                } else if (line.startsWith("[Term]")) {
+                    currentGroup = new CategorizedSamplePropertyGroup();
+                } else if (currentGroup != null) {
+                    int index = line.indexOf(":");
+                    if (line.startsWith("id")) {                     
+                        currentChildTerm = line.substring(index + 1).trim();
+                        currentGroup.setUniqueID(currentChildTerm);
+                    } else if (line.startsWith("name")) {
+                        String customizedName = line.substring(index + 1).trim();
+                        currentGroup.setCustomizedName(customizedName);
+                    } else if (line.startsWith("is_a")) {
+                        line = line.substring(index + 1);
+                        groupSetting.addGroupBranch(line, currentChildTerm);                       
+                    }
+                }
             }
-            CategorizedSamplePropertyGroup group = new CategorizedSamplePropertyGroup(set.toString());
-            group.addAll(set);
-            newGroups.add(group);
+            reader.close();
+        } catch (Exception e) {
+            return null;
         }
-
-        setWithNewGroups(newGroups);
-        return true;
+        
+        return groupSetting;
     }
 }

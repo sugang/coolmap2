@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import javax.swing.DefaultRowSorter;
@@ -172,14 +173,14 @@ public class WidgetSamplePropertyTable extends Widget {
                         } else {
 
                             CategorizedPropertyGroupSetting setting = (CategorizedPropertyGroupSetting) originalSetting;
-                            ArrayList<SamplePropertyGroup> groups = setting.getGroups();
+                            Collection<SamplePropertyGroup> groups = setting.getGroups();
 
                             final ArrayList<String> data = new ArrayList<>();
-                            //Object data[][] = new Object[groups.size()][1];
 
-                            for (int i = 0; i < groups.size(); ++i) {
-                                data.add(groups.get(i).customizedName);
+                            for (SamplePropertyGroup group : groups) {
+                                data.add(group.getCustomizedName());
                             }
+                      
 
                             final JList list = new JList(data.toArray());
 
@@ -248,7 +249,7 @@ public class WidgetSamplePropertyTable extends Widget {
 
                                     }
 
-                                    _dataMatrix.setCatePropGroup(col - 1, newSettings);
+                                    //_dataMatrix.setCatePropGroup(col - 1, newSettings);
 
                                 }
 

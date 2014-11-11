@@ -8,6 +8,7 @@ package coolmap.data.contology.model.spmatrix;
 /**
  *
  * @author Keqiang Li
+ * @param <T> which primitive type the property contains
  */
 public abstract class SampleProperty<T> {
 
@@ -26,7 +27,7 @@ public abstract class SampleProperty<T> {
 
     public String getDisplayName() {
         if (_group != null) {
-            return _group.customizedName;
+            return _group.getCustomizedName();
         }
         return getDisplayValue();
     }

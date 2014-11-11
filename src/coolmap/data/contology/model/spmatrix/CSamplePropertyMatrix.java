@@ -9,6 +9,7 @@ import coolmap.application.CoolMapMaster;
 import coolmap.application.widget.impl.console.CMConsole;
 import coolmap.data.contology.model.COntology;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -103,7 +104,7 @@ public class CSamplePropertyMatrix {
             PropertyGroupSetting setting;
             switch (_propContinuity.get(propType)) {
                 case PROPERTY_CONTINUITY_CATEGORIZED:
-                    setting = _generateDefaultGroupForCatagorizedProp(propType);
+                    setting = _generateDefaultGroupForCategorizedProp(propType);
                     break;
                 case PROPERTY_CONTINUITY_CONTINUOUS:
                     setting = _generateDefaultGroupForContinuousProp(propType);
@@ -159,7 +160,7 @@ public class CSamplePropertyMatrix {
     private void _assignGroup() {
         for (String propType : _propOrder) {
             ArrayList<SampleProperty> tmpProperties = _propNameToProperties.get(propType);
-            ArrayList<SamplePropertyGroup> groups = _propGroupInfo.get(propType).getGroups();
+            Collection<SamplePropertyGroup> groups = _propGroupInfo.get(propType).getGroups();
 
             for (SampleProperty prop : tmpProperties) {
                 for (SamplePropertyGroup group : groups) {
@@ -172,19 +173,18 @@ public class CSamplePropertyMatrix {
         }
     }
 
-    // function to generate groups for continuous property
-    private PropertyGroupSetting _generateDefaultGroupForCatagorizedProp(String propType) {
-        PropertyGroupSetting setting = new CategorizedPropertyGroupSetting(propType, _propUniqValues.get(propType));
-        ArrayList<SamplePropertyGroup<String>> groupList = new ArrayList<>();
+    // function to generate default groups for categorized property
+    private PropertyGroupSetting _generateDefaultGroupForCategorizedProp(String propType) {
+        PropertyGroupSetting setting = new CategorizedPropertyGroupSetting(propType);
 
         for (String value : _propUniqValues.get(propType)) {
-            HashSet<String> set = new HashSet<>();
-            set.add(value);
-            CategorizedSamplePropertyGroup tmpGroup = new CategorizedSamplePropertyGroup(set.toString());
-            tmpGroup.addAll(set);
-            groupList.add(tmpGroup);
+            CategorizedSamplePropertyGroup tmpGroup = new CategorizedSamplePropertyGroup(value, value);
+            HashSet<String> values = new HashSet<>();
+            values.add(value);
+            tmpGroup.setValues(values);
+            setting.addGroup(tmpGroup);
         }
-        setting.addAll(groupList);
+
         return setting;
     }
 
@@ -204,7 +204,7 @@ public class CSamplePropertyMatrix {
         }
 
         ContinuousPropertyGroupSetting setting = new ContinuousPropertyGroupSetting(propType, min, max);
-        ArrayList<SamplePropertyGroup<Double>> groupList = new ArrayList<>();
+        ArrayList<SamplePropertyGroup> groupList = new ArrayList<>();
 
         if (_propUniqValues.get(propType).size() <= NUMBER_LIMIT_OF_UNIQUE_CONTINUOUS_VALUE) {
             for (String value : _propUniqValues.get(propType)) {
@@ -224,7 +224,7 @@ public class CSamplePropertyMatrix {
             }
         }
 
-        setting.addAll(groupList);
+        setting.addAllGroups(groupList);
         return setting;
     }
 
@@ -338,9 +338,9 @@ public class CSamplePropertyMatrix {
             return;
         }
 
-        ArrayList<SamplePropertyGroup> curPropGroups = _propGroupInfo.get(_propOrder.get(curPropIndex)).getGroups();
+        Collection<SamplePropertyGroup> curPropGroups = _propGroupInfo.get(_propOrder.get(curPropIndex)).getGroups();
         for (SamplePropertyGroup group : curPropGroups) {
-            String curLevelLable = prefix + "-" + group.customizedName;
+            String curLevelLable = prefix + "-" + group.getCustomizedName();
             _ontology.addRelationshipNoUpdateDepth(prefix, curLevelLable);
             _depthFirstBuildOntology(curLevelLable, curPropIndex + 1);
         }
@@ -369,6 +369,8 @@ public class CSamplePropertyMatrix {
         _updateGroups();
     }
 
+    
+    /*
     public boolean setCatePropGroup(int index, ArrayList<HashSet> sets) {
         if (index < 0 || index > _propOrder.size() - 1) {
             return false;
@@ -387,7 +389,7 @@ public class CSamplePropertyMatrix {
             return true;
         }
         return false;
-    }
+    } */
 
     public boolean setContPropGroup(int index, ArrayList<Double> values) {
         if (index < 0 || index > _propOrder.size() - 1) {

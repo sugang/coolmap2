@@ -145,7 +145,7 @@ public class SimpleOBOTree {
             }
         }
 
-        //simpleOboTree.ontology.validate();
+        simpleOboTree.ontology.validate();
         return simpleOboTree;
     }
     

@@ -65,6 +65,7 @@ public class SamplePropertyMaster {
         samplePropertyWidget.updateTable(matrix);
     }
 
+    
     public static boolean applyOBOGroupSetting(SimpleOBOTree oboTree, String _curPropString) {
 
         Set<String> allParents = oboTree.getParentNodeIDs();
@@ -79,7 +80,8 @@ public class SamplePropertyMaster {
             groupsList.add(newGroup);
         }
 
-        return getFirst().setCatePropGroup(_curPropString, groupsList);
+        return false;
+        //return getFirst().setCatePropGroup(_curPropString, groupsList);
 
     }
 

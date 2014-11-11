@@ -41,8 +41,9 @@ public class ImportSamplePropertyTableAction extends AbstractAction {
         final File f = chooser.getSelectedFile();
         if (f != null && f.isFile() && f.exists()) {
 
-            LongTask task = new LongTask("import sample property file...") {
-
+            LongTask task;
+            task = new LongTask("import sample property file...") {
+                
                 @Override
                 public void run() {
                     try {

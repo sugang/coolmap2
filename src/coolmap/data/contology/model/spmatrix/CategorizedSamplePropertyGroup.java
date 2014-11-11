@@ -12,45 +12,40 @@ import java.util.HashSet;
  * @author Keqiang Li
  */
 public class CategorizedSamplePropertyGroup extends SamplePropertyGroup<String> {
+    // imported from OBO files, so every group has an unique ID
+    private String _uniqueID;
+    private HashSet<String> _allValues;
 
-    private final HashSet<String> _group;
-
-    public CategorizedSamplePropertyGroup(String name) {
-        super(name);
-        _group = new HashSet<>();
+    public CategorizedSamplePropertyGroup(String customizedName, String ID) {
+        super(customizedName);
+        this._uniqueID = ID;
     }
-
-    public void addValue(String value) {
-        _group.add(value);
+    
+    public CategorizedSamplePropertyGroup() {
+        super("");
+        _uniqueID = "";
     }
-
-    public void removeValue(String value) {
-        if (_group.contains(value)) {
-            _group.remove(value);
-        }
+    
+    @Override
+    public String getUniqueID() {
+        return _uniqueID;
     }
-
-    public void addAll(HashSet<String> values) {
-        _group.addAll(values);
+    
+    public void setUniqueID(String ID) {
+        _uniqueID = ID;
     }
-
-    public void clear() {
-        _group.clear();
+    
+    public void setValues(HashSet<String> values) {
+        _allValues = values;
     }
-
-    public int getSize() {
-        return _group.size();
+    
+    @Override
+    public String toString() {
+        return getCustomizedName();
     }
 
     @Override
     public boolean contains(String value) {
-        return _group.contains(value);
+        return _allValues.contains(value);
     }
-    
-    @Override
-    public String toString()
-    {
-        return _group.toString();
-    }
-
 }

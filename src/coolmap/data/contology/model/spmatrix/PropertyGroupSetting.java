@@ -6,6 +6,8 @@
 package coolmap.data.contology.model.spmatrix;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 /**
  *
@@ -14,35 +16,41 @@ import java.util.ArrayList;
 public class PropertyGroupSetting {
 
     private final String _propType;
-    private final ArrayList<SamplePropertyGroup> _groups;
+    protected final HashMap<String, SamplePropertyGroup> _groups;
 
     public PropertyGroupSetting(String propType) {
         this._propType = propType;
-        _groups = new ArrayList<>();
+        _groups = new HashMap<>();
     }
-
-    public void addAll(ArrayList groups) {
-        _groups.addAll(groups);
-    }
-
+    
     public void clear() {
         _groups.clear();
     }
 
+    public void addAllGroups(ArrayList<SamplePropertyGroup> groups) {
+        for (SamplePropertyGroup group : groups) {
+            addGroup(group);
+        }
+    }
+    
     public void addGroup(SamplePropertyGroup newGroup) {
-        _groups.add(newGroup);
+        _groups.put(newGroup.getUniqueID(), newGroup);
     }
 
     public void setWithNewGroups(ArrayList<SamplePropertyGroup> newGroups) {
         clear();
-        addAll(newGroups);
+        addAllGroups(newGroups);
     }
 
     public int getGroupNum() {
         return _groups.size();
     }
 
-    public ArrayList<SamplePropertyGroup> getGroups() {
-        return _groups;
+    public Collection<SamplePropertyGroup> getGroups() {
+        return _groups.values();
+    }
+    
+    protected SamplePropertyGroup getGroup(String groupID) {
+        return _groups.get(groupID);
     }
 }

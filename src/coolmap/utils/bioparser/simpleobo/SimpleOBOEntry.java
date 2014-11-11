@@ -15,9 +15,9 @@ import java.util.Set;
  */
 public class SimpleOBOEntry {
 
-    public static String ID = "id";
-    public static String NAME = "name";
-    public static String NAMESPACE = "namespace";
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String NAMESPACE = "namespace";
     private String id = null;
     private String name = null;
     private String namespace = null;
