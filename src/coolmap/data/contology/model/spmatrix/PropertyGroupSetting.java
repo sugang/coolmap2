@@ -16,7 +16,7 @@ import java.util.HashMap;
 public class PropertyGroupSetting {
 
     private final String _propType;
-    protected final HashMap<String, SamplePropertyGroup> _groups;
+    private final HashMap<String, SamplePropertyGroup> _groups;
 
     public PropertyGroupSetting(String propType) {
         this._propType = propType;

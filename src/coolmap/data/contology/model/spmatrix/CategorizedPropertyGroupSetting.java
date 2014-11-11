@@ -9,7 +9,6 @@ import com.google.common.collect.HashMultimap;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 
 /**
  *
@@ -20,7 +19,6 @@ public class CategorizedPropertyGroupSetting extends PropertyGroupSetting {
     // stores all the parent-children relations
 
     private final HashMultimap<String, String> _groupTree = HashMultimap.create();
-    private final HashMap<String, CategorizedSamplePropertyGroup> _groups = new HashMap<>();
 
     public CategorizedPropertyGroupSetting(String propType) {
         super(propType);

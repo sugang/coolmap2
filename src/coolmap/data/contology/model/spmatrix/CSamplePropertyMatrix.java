@@ -369,27 +369,21 @@ public class CSamplePropertyMatrix {
         _updateGroups();
     }
 
-    
-    /*
-    public boolean setCatePropGroup(int index, ArrayList<HashSet> sets) {
+    public boolean setCatePropGroup(int index, CategorizedPropertyGroupSetting newSetting) {
         if (index < 0 || index > _propOrder.size() - 1) {
             return false;
         }
-        return setCatePropGroup(_propOrder.get(index), sets);
+        return setCatePropGroup(_propOrder.get(index), newSetting);
     }
 
-    public boolean setCatePropGroup(String catePropType, ArrayList<HashSet> sets) {
+    public boolean setCatePropGroup(String catePropType, CategorizedPropertyGroupSetting newSetting) {
         if (!_propContinuity.get(catePropType).equals(PROPERTY_CONTINUITY_CATEGORIZED)) {
             return false;
         }
-        CategorizedPropertyGroupSetting setting = (CategorizedPropertyGroupSetting) _propGroupInfo.get(catePropType);
-        if (setting.setWithSets(sets)) {
-            _propGroupInfo.put(catePropType, setting);
-            _updateGroups();
-            return true;
-        }
-        return false;
-    } */
+        _propGroupInfo.put(catePropType, newSetting);
+        _updateGroups();
+        return true;
+    }
 
     public boolean setContPropGroup(int index, ArrayList<Double> values) {
         if (index < 0 || index > _propOrder.size() - 1) {

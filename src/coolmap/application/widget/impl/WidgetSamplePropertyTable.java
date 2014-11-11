@@ -6,7 +6,8 @@
 package coolmap.application.widget.impl;
 
 import coolmap.application.CoolMapMaster;
-import coolmap.application.io.actions.spmatrix.ImportPropertyGroupSettingFromOBOAction;
+import coolmap.application.io.actions.spmatrix.ImportPropertyNameGroupSettingFromOBOAction;
+import coolmap.application.io.actions.spmatrix.ImportPropertyIDGroupSettingFromOBOAction;
 import coolmap.application.widget.Widget;
 import coolmap.data.contology.model.spmatrix.CSamplePropertyMatrix;
 import coolmap.data.contology.model.spmatrix.CategorizedPropertyGroupSetting;
@@ -98,14 +99,20 @@ public class WidgetSamplePropertyTable extends Widget {
                 boolean isCategorizedProp = _dataMatrix.isCategorizedProp(col - 1);
                 
                 if (isCategorizedProp) {
-                    JMenuItem importGroupItem = new JMenuItem(new ImportPropertyGroupSettingFromOBOAction(_dataMatrix.getPropType(col - 1)));
-                    importGroupItem.setText("Import Group Setting from OBO File");
-                    tableHeaderPopupMenu.add(importGroupItem);
+                    JMenuItem importIDGroupItem = new JMenuItem(new ImportPropertyIDGroupSettingFromOBOAction(_dataMatrix.getPropType(col - 1)));
+                    importIDGroupItem.setText("Import Group Setting from OBO File (map properties to ids)");
+                    tableHeaderPopupMenu.add(importIDGroupItem);
+                    
+                    JMenuItem importNameGroupItem = new JMenuItem(new ImportPropertyNameGroupSettingFromOBOAction(_dataMatrix.getPropType(col - 1)));
+                    importNameGroupItem.setText("Import Group Setting from OBO File (map properties to names");
+                    tableHeaderPopupMenu.add(importNameGroupItem);
                 }
 
+                
                 JMenuItem editGroupItem = new JMenuItem("Edit Group");              
-
-                tableHeaderPopupMenu.add(editGroupItem);
+               // if (!isCategorizedProp) {
+                    tableHeaderPopupMenu.add(editGroupItem);
+                //}
 
                 tableHeaderPopupMenu.show(_tableHeader, headerClickEvent.getX(), headerClickEvent.getY());
 

@@ -7,14 +7,14 @@ package coolmap.application.io.actions.spmatrix;
 
 import coolmap.application.CoolMapMaster;
 import coolmap.application.SamplePropertyMaster;
-import coolmap.application.io.external.ImportOBOFromFile;
 import coolmap.application.utils.LongTask;
 import coolmap.application.utils.TaskEngine;
 import coolmap.application.widget.impl.console.CMConsole;
+import coolmap.data.contology.model.spmatrix.CategorizedPropertyGroupSetting;
 import coolmap.utils.Tools;
-import coolmap.utils.bioparser.simpleobo.SimpleOBOTree;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -23,18 +23,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  * @author Keqiang Li
  */
-public class ImportPropertyGroupSettingFromOBOAction extends AbstractAction{
+public class ImportPropertyIDGroupSettingFromOBOAction extends AbstractAction{
     
-    private String _curPropString;
-    
-    public ImportPropertyGroupSettingFromOBOAction() {
-        super("from OBO group setting file");
-        putValue(javax.swing.AbstractAction.SHORT_DESCRIPTION, "import OBO group setting from .obo files");
-    }
+    private final String _curPropString;
 
-    public ImportPropertyGroupSettingFromOBOAction(String propType) {
-        super();
+    public ImportPropertyIDGroupSettingFromOBOAction(String propType) {
+        super("from OBO group setting file");
         _curPropString = propType;
+        putValue(javax.swing.AbstractAction.SHORT_DESCRIPTION, "import OBO group setting from .obo files (map properties to ids)");
     }
 
     @Override
@@ -52,12 +48,13 @@ public class ImportPropertyGroupSettingFromOBOAction extends AbstractAction{
                 @Override
                 public void run() {
                     try {
-                        SimpleOBOTree oboTree = ImportOBOFromFile.importOBOGroupSettingFromFile(f);
-                        if (oboTree == null) {
+                        CategorizedPropertyGroupSetting newSetting  = CategorizedPropertyGroupSetting.importGroupSettingFromOBOFile(f.getName(), new FileInputStream(f));
+                       
+                        if (newSetting == null) {
                             return;
                         }
                         
-                        boolean result = SamplePropertyMaster.applyOBOGroupSetting(oboTree, _curPropString);
+                        boolean result = SamplePropertyMaster.applyOBOGroupSetting(newSetting, _curPropString);
 
                         if (result) {
                             CMConsole.logInSuccess("OBO File imported and group settings applied " + f.getPath());

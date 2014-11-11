@@ -8,9 +8,7 @@ package coolmap.application;
 import coolmap.application.widget.WidgetMaster;
 import coolmap.application.widget.impl.WidgetSamplePropertyTable;
 import coolmap.data.contology.model.spmatrix.CSamplePropertyMatrix;
-import coolmap.utils.bioparser.simpleobo.SimpleOBOTree;
-import java.util.ArrayList;
-import java.util.HashSet;
+import coolmap.data.contology.model.spmatrix.CategorizedPropertyGroupSetting;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -66,23 +64,8 @@ public class SamplePropertyMaster {
     }
 
     
-    public static boolean applyOBOGroupSetting(SimpleOBOTree oboTree, String _curPropString) {
-
-        Set<String> allParents = oboTree.getParentNodeIDs();
-        ArrayList<HashSet> groupsList = new ArrayList<>();
-        for (String parent : allParents) {
-            String[] allElements = parent.split(",");
-            // use get parents
-            HashSet<String> newGroup = new HashSet<>();
-            for (int i = 0; i < allElements.length; ++i) {
-                newGroup.add(allElements[i].trim());
-            }
-            groupsList.add(newGroup);
-        }
-
-        return false;
-        //return getFirst().setCatePropGroup(_curPropString, groupsList);
-
+    public static boolean applyOBOGroupSetting(CategorizedPropertyGroupSetting newSetting, String _curPropString) {
+        return getFirst().setCatePropGroup(_curPropString, newSetting);
     }
 
 }
