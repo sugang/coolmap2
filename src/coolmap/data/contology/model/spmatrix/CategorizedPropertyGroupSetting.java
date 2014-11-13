@@ -102,10 +102,6 @@ public class CategorizedPropertyGroupSetting extends PropertyGroupSetting<String
             String curGroupID = group.getUniqueID();
             Set<String> curGroupChildSet = _groupTree.get(curGroupID);
             // if current group has no children, it's a leaf node group then.
-            if (curGroupID.equals("OTHER")) {
-                ((CategorizedSamplePropertyGroup) group).addValue(group.getUniqueID());
-                _addValuesToParents(group.getUniqueID());
-            }
             if (curGroupChildSet == null || curGroupChildSet.isEmpty()) {
                 ((CategorizedSamplePropertyGroup) group).addValue(group.getUniqueID());
                 _addValuesToParents(group.getUniqueID());

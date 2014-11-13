@@ -358,9 +358,17 @@ public class CSamplePropertyMatrix {
             String prefix = "Root";
             ArrayList<SampleProperty> properties = _sampleNameToProperties.get(sampleName);
             for (SampleProperty property : properties) {
-                prefix = prefix + "-" + property.getDisplayName();
+                //String propType = property.propType;
+                //if (isCategorizedProp(propType)) {
+                    
+               // } else {
+                    prefix = prefix + "-" + property.getDisplayName();
+                    
+             //   }
             }
+            
             _ontology.addRelationshipNoUpdateDepth(prefix, prefix + "-" + sampleName);
+            
         }
     }
 
@@ -369,9 +377,9 @@ public class CSamplePropertyMatrix {
         _reGenerateOntology();
     }
 
-    public void setPropGroup(String catePropType, PropertyGroupSetting groupSetting) {
-        _propGroupInfo.put(catePropType, groupSetting);
-        _updateGroup(catePropType);
+    public void setPropGroup(String propType, PropertyGroupSetting groupSetting) {
+        _propGroupInfo.put(propType, groupSetting);
+        _updateGroup(propType);
     }
 
     public boolean setCatePropGroup(int index, CategorizedPropertyGroupSetting newSetting) {

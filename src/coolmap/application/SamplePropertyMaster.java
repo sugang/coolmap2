@@ -9,6 +9,7 @@ import coolmap.application.widget.WidgetMaster;
 import coolmap.application.widget.impl.WidgetSamplePropertyTable;
 import coolmap.data.contology.model.spmatrix.CSamplePropertyMatrix;
 import coolmap.data.contology.model.spmatrix.CategorizedPropertyGroupSetting;
+import coolmap.data.contology.model.spmatrix.ContinuousPropertyGroupSetting;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -66,6 +67,10 @@ public class SamplePropertyMaster {
     
     public static boolean applyOBOGroupSetting(CategorizedPropertyGroupSetting newSetting, String _curPropString) {
         return getFirst().setCatePropGroup(_curPropString, newSetting);
+    }
+    
+    public static void applyContGroupSetting(ContinuousPropertyGroupSetting newSetting, String _curPropString) {
+         getFirst().setPropGroup(_curPropString, newSetting);
     }
 
 }

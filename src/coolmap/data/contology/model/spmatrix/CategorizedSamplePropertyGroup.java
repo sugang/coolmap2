@@ -70,7 +70,7 @@ public class CategorizedSamplePropertyGroup extends SamplePropertyGroup<String> 
     
     @Override
     public String toString() {
-        return getDisplayName();
+        return _allValues.toString();
     }
 
     @Override

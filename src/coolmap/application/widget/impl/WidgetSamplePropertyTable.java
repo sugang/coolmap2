@@ -6,6 +6,7 @@
 package coolmap.application.widget.impl;
 
 import coolmap.application.CoolMapMaster;
+import coolmap.application.io.actions.spmatrix.ImportContinuousPropertyGroupFromFileAction;
 import coolmap.application.io.actions.spmatrix.ImportPropertyNameGroupSettingFromOBOAction;
 import coolmap.application.io.actions.spmatrix.ImportPropertyIDGroupSettingFromOBOAction;
 import coolmap.application.widget.Widget;
@@ -45,7 +46,7 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
 /**
- * This widget class displays the imported sample property table and let users
+ * This widget displays the imported sample property table and let users
  * group and sort properties
  *
  * @author Keqiang Li
@@ -106,22 +107,26 @@ public class WidgetSamplePropertyTable extends Widget {
                     JMenuItem importNameGroupItem = new JMenuItem(new ImportPropertyNameGroupSettingFromOBOAction(_dataMatrix.getPropType(col - 1)));
                     importNameGroupItem.setText("Import Group Setting from OBO File (map properties to names");
                     tableHeaderPopupMenu.add(importNameGroupItem);
+                } else {
+                    JMenuItem importContGroupItem = new JMenuItem(new ImportContinuousPropertyGroupFromFileAction(_dataMatrix.getPropType(col - 1)));
+                    importContGroupItem.setText("Import Group Setting from text File");
+                    tableHeaderPopupMenu.add(importContGroupItem);
                 }
 
-                
-                JMenuItem editGroupItem = new JMenuItem("Edit Group");              
-               // if (!isCategorizedProp) {
+                JMenuItem viewGroupitem = new JMenuItem("View Groups");
+                JMenuItem editGroupItem = new JMenuItem("Edit Group");
+                if (isCategorizedProp) {
+                    tableHeaderPopupMenu.add(viewGroupitem);
+                } else {
                     tableHeaderPopupMenu.add(editGroupItem);
-                //}
+                }
+                
+                viewGroupitem.addActionListener(new ActionListener() {
 
-                tableHeaderPopupMenu.show(_tableHeader, headerClickEvent.getX(), headerClickEvent.getY());
-
-                editGroupItem.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-
                         // create a dialog to let user set group info
-                        final JDialog dialog = new JDialog(CoolMapMaster.getCMainFrame(), "Customize Groups");
+                        final JDialog dialog = new JDialog(CoolMapMaster.getCMainFrame(), "Viewing Groups");
 
                         dialog.setLocation(pt);
                         dialog.setLayout(new BorderLayout());
@@ -131,61 +136,14 @@ public class WidgetSamplePropertyTable extends Widget {
                         if (originalSetting == null) {
                             return;
                         }
-                        if (originalSetting instanceof ContinuousPropertyGroupSetting) {
-
-                            final ContinuousPropertyGroupSetting oldSetting = (ContinuousPropertyGroupSetting) originalSetting;
-
-                            final JTextField editGroup = new JTextField();
-                            JTextField minValueField = new JTextField("" + oldSetting.getMin() + ",");
-                            JTextField maxValueField = new JTextField("," + oldSetting.getMax());
-                            minValueField.setEditable(false);
-                            maxValueField.setEditable(false);
-
-                            dialog.add(minValueField, BorderLayout.WEST);
-                            dialog.add(maxValueField, BorderLayout.EAST);
-                            dialog.add(editGroup, BorderLayout.CENTER);
-
-                            dialog.setSize(300, 100);
-                            dialog.setVisible(true);
-
-                            JButton confirmEditButton = new JButton("Change");
-                            dialog.add(confirmEditButton, BorderLayout.SOUTH);
-
-                            confirmEditButton.addMouseListener(new MouseAdapter() {
-
-                                @Override
-                                public void mouseClicked(MouseEvent e) {
-                                    dialog.setVisible(false);
-
-                                    String changedString = editGroup.getText();
-                                    ArrayList<Double> newGroupList = new ArrayList<>();
-
-                                    String[] interResult = changedString.split(",");
-                                    for (int i = 0; i < interResult.length; ++i) {
-                                        interResult[i] = interResult[i].trim();
-                                        try {
-                                            Double curValue = Double.parseDouble(interResult[i]);
-                                            newGroupList.add(curValue);
-                                        } catch (NumberFormatException ex) {
-                                        }
-                                    }
-
-                                    String curPorpType = _dataMatrix.getPropType(col - 1);
-                                    ContinuousPropertyGroupSetting newSetting = new ContinuousPropertyGroupSetting(curPorpType, oldSetting.getMin(), oldSetting.getMax());
-                                    newSetting.setWithMarks(newGroupList);
-                                    _dataMatrix.setPropGroup(curPorpType, newSetting);
-                                }
-                            });
-
-                        } else {
-
-                            CategorizedPropertyGroupSetting setting = (CategorizedPropertyGroupSetting) originalSetting;
+                        
+                        CategorizedPropertyGroupSetting setting = (CategorizedPropertyGroupSetting) originalSetting;
                             Collection<SamplePropertyGroup> groups = setting.getGroups();
 
                             final ArrayList<String> data = new ArrayList<>();
 
                             for (SamplePropertyGroup group : groups) {
-                                data.add(group.getDisplayName());
+                                data.add(group.toString());
                             }
                       
 
@@ -261,8 +219,76 @@ public class WidgetSamplePropertyTable extends Widget {
                                 }
 
                             });
-                        }
+                            
+                            dialog.setVisible(true);
+                    }
+                });
 
+                tableHeaderPopupMenu.show(_tableHeader, headerClickEvent.getX(), headerClickEvent.getY());
+
+                editGroupItem.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        // create a dialog to let user set group info
+                        final JDialog dialog = new JDialog(CoolMapMaster.getCMainFrame(), "Customize Groups");
+
+                        dialog.setLocation(pt);
+                        dialog.setLayout(new BorderLayout());
+
+                        PropertyGroupSetting originalSetting = _dataMatrix.getGroupSettingForProperty(col - 1);
+                        // no default settings found, should never happen
+                        if (originalSetting == null) {
+                            return;
+                        }
+                        if (originalSetting instanceof ContinuousPropertyGroupSetting) {
+
+                            final ContinuousPropertyGroupSetting oldSetting = (ContinuousPropertyGroupSetting) originalSetting;
+
+                            final JTextField editGroup = new JTextField();
+                            JTextField minValueField = new JTextField("" + oldSetting.getMin() + ",");
+                            JTextField maxValueField = new JTextField("," + oldSetting.getMax());
+                            minValueField.setEditable(false);
+                            maxValueField.setEditable(false);
+
+                            dialog.add(minValueField, BorderLayout.WEST);
+                            dialog.add(maxValueField, BorderLayout.EAST);
+                            dialog.add(editGroup, BorderLayout.CENTER);
+
+                            dialog.setSize(300, 100);
+                            dialog.setVisible(true);
+
+                            JButton confirmEditButton = new JButton("Change");
+                            dialog.add(confirmEditButton, BorderLayout.SOUTH);
+
+                            confirmEditButton.addMouseListener(new MouseAdapter() {
+
+                                @Override
+                                public void mouseClicked(MouseEvent e) {
+                                    dialog.setVisible(false);
+
+                                    String changedString = editGroup.getText();
+                                    ArrayList<Double> newGroupList = new ArrayList<>();
+
+                                    String[] interResult = changedString.split(",");
+                                    for (int i = 0; i < interResult.length; ++i) {
+                                        interResult[i] = interResult[i].trim();
+                                        try {
+                                            Double curValue = Double.parseDouble(interResult[i]);
+                                            newGroupList.add(curValue);
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                    }
+
+                                    String curPorpType = _dataMatrix.getPropType(col - 1);
+                                    ContinuousPropertyGroupSetting newSetting = new ContinuousPropertyGroupSetting(curPorpType, oldSetting.getMin(), oldSetting.getMax());
+                                    newSetting.setWithMarks(newGroupList);
+                                    _dataMatrix.setPropGroup(curPorpType, newSetting);
+                                }
+                            });
+
+                        } 
+                        
                         dialog.setVisible(true);
                     }
                 });
