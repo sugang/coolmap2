@@ -38,7 +38,7 @@ public class ContinuousSamplePropertyGroup extends SamplePropertyGroup<Double> {
 
     @Override
     public String getUniqueID() {
-        return getCustomizedName();
+        return getDisplayName();
     }
 
     @Override

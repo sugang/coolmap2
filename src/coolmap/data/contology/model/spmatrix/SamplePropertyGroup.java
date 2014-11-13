@@ -13,18 +13,18 @@ package coolmap.data.contology.model.spmatrix;
 // user customized property group. users may group values from 1 to 100 as group "1-100"
 public abstract class SamplePropertyGroup<T> {
 
-    private String _customizedName;
+    private String _displayName;
 
     public SamplePropertyGroup(String name) {
-        this._customizedName = name;
+        this._displayName = name;
     }
     
-    public void setCustomizedName(String name) {
-       _customizedName = name;
+    public void setDisplayName(String name) {
+       _displayName = name;
     }
     
-    public String getCustomizedName() {
-        return _customizedName;
+    public String getDisplayName() {
+        return _displayName;
     }
     
     public abstract String getUniqueID();

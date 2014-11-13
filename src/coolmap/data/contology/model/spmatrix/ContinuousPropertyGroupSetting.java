@@ -11,7 +11,7 @@ import java.util.ArrayList;
  *
  * @author Keqiang Li
  */
-public class ContinuousPropertyGroupSetting extends PropertyGroupSetting {
+public class ContinuousPropertyGroupSetting extends PropertyGroupSetting <Double> {
 
     private final double _min;
     private final double _max;
@@ -45,5 +45,10 @@ public class ContinuousPropertyGroupSetting extends PropertyGroupSetting {
 
         setWithNewGroups(newGroups);
         return true;
+    }
+
+    @Override
+    public SamplePropertyGroup assignGroup(SamplePropertyGroup curGroup, Double propertyValue) {
+        return curGroup;
     }
 }

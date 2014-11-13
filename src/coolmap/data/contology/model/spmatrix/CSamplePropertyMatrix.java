@@ -11,7 +11,6 @@ import coolmap.data.contology.model.COntology;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
@@ -67,7 +66,9 @@ public class CSamplePropertyMatrix {
         // using the passed-in arguments to generate property objects
         _generateProps();
         // assign group to each input property
-        _assignGroup();
+        for (String propType : _propOrder) {
+            _assignGroup(propType);
+        }
 
         _setUp();
     }
@@ -76,7 +77,7 @@ public class CSamplePropertyMatrix {
         ArrayList<String> result = new ArrayList<>();
 
         for (SampleProperty property : _sampleNameToProperties.get(sampleName)) {
-            result.add(property.getDisplayValue());
+            result.add(property.getDisplayName());
         }
         return result;
     }
@@ -157,17 +158,15 @@ public class CSamplePropertyMatrix {
     }
 
     // assign groups to properties
-    private void _assignGroup() {
-        for (String propType : _propOrder) {
-            ArrayList<SampleProperty> tmpProperties = _propNameToProperties.get(propType);
-            Collection<SamplePropertyGroup> groups = _propGroupInfo.get(propType).getGroups();
+    private void _assignGroup(String propType) {
+        ArrayList<SampleProperty> tmpProperties = _propNameToProperties.get(propType);
+        Collection<SamplePropertyGroup> groups = _propGroupInfo.get(propType).getGroups();
 
-            for (SampleProperty prop : tmpProperties) {
-                for (SamplePropertyGroup group : groups) {
-                    if (group.contains(prop.value)) {
-                        prop.setGroup(group);
-                        break;
-                    }
+        for (SampleProperty prop : tmpProperties) {
+            for (SamplePropertyGroup group : groups) {
+                if (group.contains(prop.value)) {
+                    prop.setGroup(_propGroupInfo.get(propType).assignGroup(group, prop.value));
+                    break;
                 }
             }
         }
@@ -175,16 +174,20 @@ public class CSamplePropertyMatrix {
 
     // function to generate default groups for categorized property
     private PropertyGroupSetting _generateDefaultGroupForCategorizedProp(String propType) {
-        PropertyGroupSetting setting = new CategorizedPropertyGroupSetting(propType);
+        CategorizedPropertyGroupSetting setting = new CategorizedPropertyGroupSetting(propType);
+
+        CategorizedSamplePropertyGroup topLevelGroup = new CategorizedSamplePropertyGroup(propType + " all properties", propType + " top level group");
+        setting.addGroup(topLevelGroup);
 
         for (String value : _propUniqValues.get(propType)) {
             CategorizedSamplePropertyGroup tmpGroup = new CategorizedSamplePropertyGroup(value, value);
-            HashSet<String> values = new HashSet<>();
-            values.add(value);
-            tmpGroup.setValues(values);
+            tmpGroup.setParent(topLevelGroup.getUniqueID());
+            tmpGroup.addValue(value);
             setting.addGroup(tmpGroup);
+            setting.addGroupBranch(topLevelGroup.getUniqueID(), tmpGroup.getUniqueID());
         }
 
+        setting.validate();
         return setting;
     }
 
@@ -238,15 +241,17 @@ public class CSamplePropertyMatrix {
 
     /**
      * takes a new order of properties and apply it to current data matrix
-     * ontology regeneration takes place if the order is different from the original order
+     * ontology regeneration takes place if the order is different from the
+     * original order
+     *
      * @param newOrder the new order of the properties
      */
     public void setPropOrder(ArrayList<String> newOrder) {
-    
+
         if (_propOrder == newOrder || _propOrder.equals(newOrder)) {
             return;
         }
-       
+
         _propOrder.clear();
         _propOrder.addAll(newOrder);
         _setUp();
@@ -340,7 +345,7 @@ public class CSamplePropertyMatrix {
 
         Collection<SamplePropertyGroup> curPropGroups = _propGroupInfo.get(_propOrder.get(curPropIndex)).getGroups();
         for (SamplePropertyGroup group : curPropGroups) {
-            String curLevelLable = prefix + "-" + group.getCustomizedName();
+            String curLevelLable = prefix + "-" + group.getDisplayName();
             _ontology.addRelationshipNoUpdateDepth(prefix, curLevelLable);
             _depthFirstBuildOntology(curLevelLable, curPropIndex + 1);
         }
@@ -359,14 +364,14 @@ public class CSamplePropertyMatrix {
         }
     }
 
-    private void _updateGroups() {
-        _assignGroup();
+    private void _updateGroup(String propType) {
+        _assignGroup(propType);
         _reGenerateOntology();
     }
 
     public void setPropGroup(String catePropType, PropertyGroupSetting groupSetting) {
         _propGroupInfo.put(catePropType, groupSetting);
-        _updateGroups();
+        _updateGroup(catePropType);
     }
 
     public boolean setCatePropGroup(int index, CategorizedPropertyGroupSetting newSetting) {
@@ -381,7 +386,7 @@ public class CSamplePropertyMatrix {
             return false;
         }
         _propGroupInfo.put(catePropType, newSetting);
-        _updateGroups();
+        _updateGroup(catePropType);
         return true;
     }
 
@@ -399,7 +404,7 @@ public class CSamplePropertyMatrix {
         ContinuousPropertyGroupSetting setting = (ContinuousPropertyGroupSetting) _propGroupInfo.get(contPropType);
         if (setting.setWithMarks(values)) {
             _propGroupInfo.put(contPropType, setting);
-            _updateGroups();
+            _updateGroup(contPropType);
             return true;
         }
         return false;
@@ -423,23 +428,23 @@ public class CSamplePropertyMatrix {
         }
         return _propOrder.get(index);
     }
-    
+
     public boolean isCategorizedProp(int index) {
         String propType = _propOrder.get(index);
         return isCategorizedProp(propType);
     }
-    
+
     public boolean isCategorizedProp(String propType) {
         if (_propContinuity.containsKey(propType)) {
             String continuity = _propContinuity.get(propType);
-            switch(continuity) {
+            switch (continuity) {
                 case PROPERTY_CONTINUITY_CONTINUOUS:
                     return false;
                 case PROPERTY_CONTINUITY_CATEGORIZED:
                     return true;
             }
         }
-        
+
         return false;
     }
 }

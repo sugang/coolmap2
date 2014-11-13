@@ -9,15 +9,15 @@ import com.google.common.collect.HashMultimap;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Set;
 
 /**
  *
  * @author Keqiang Li
  */
-public class CategorizedPropertyGroupSetting extends PropertyGroupSetting {
+public class CategorizedPropertyGroupSetting extends PropertyGroupSetting<String> {
 
     // stores all the parent-children relations
-
     private final HashMultimap<String, String> _groupTree = HashMultimap.create();
 
     public CategorizedPropertyGroupSetting(String propType) {
@@ -31,9 +31,9 @@ public class CategorizedPropertyGroupSetting extends PropertyGroupSetting {
 
     /**
      * @author Keqiang Li.
-     * @param propType to which property the settings will be applied 
+     * @param propType to which property the settings will be applied
      * @param in the input stream from the OBO file
-     * @return the imported OBO file as a tree
+     * @return the imported OBO file as a tree structured data object
      *
      */
     public static CategorizedPropertyGroupSetting importGroupSettingFromOBOFile(String propType, InputStream in) {
@@ -45,7 +45,7 @@ public class CategorizedPropertyGroupSetting extends PropertyGroupSetting {
 
         String line;
         String currentChildTerm = null;
-        
+
         try {
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
@@ -58,15 +58,17 @@ public class CategorizedPropertyGroupSetting extends PropertyGroupSetting {
                     currentGroup = new CategorizedSamplePropertyGroup();
                 } else if (currentGroup != null) {
                     int index = line.indexOf(":");
-                    if (line.startsWith("id")) {                     
+                    if (line.startsWith("id")) {
                         currentChildTerm = line.substring(index + 1).trim();
                         currentGroup.setUniqueID(currentChildTerm);
                     } else if (line.startsWith("name")) {
-                        String customizedName = line.substring(index + 1).trim();
-                        currentGroup.setCustomizedName(customizedName);
+                        String uniqueName = line.substring(index + 1).trim();
+                        currentGroup.setUniqueName(uniqueName);
+                        currentGroup.setDisplayName(uniqueName);
                     } else if (line.startsWith("is_a")) {
                         line = line.substring(index + 1);
-                        groupSetting.addGroupBranch(line, currentChildTerm);                       
+                        currentGroup.setParent(line);
+                        groupSetting.addGroupBranch(line, currentChildTerm);
                     }
                 }
             }
@@ -74,7 +76,51 @@ public class CategorizedPropertyGroupSetting extends PropertyGroupSetting {
         } catch (Exception e) {
             return null;
         }
-        
+
+        if (currentGroup != null) {
+            groupSetting.addGroup(currentGroup); //if it's not null, add a new entry
+        }
+        groupSetting.validate();
         return groupSetting;
+    }
+
+    @Override
+    public SamplePropertyGroup assignGroup(SamplePropertyGroup curGroup, String propertyValue) {
+        Set<String> childGroups = _groupTree.get(curGroup.getUniqueID());
+        for (String child : childGroups) {
+            CategorizedSamplePropertyGroup childGroup = (CategorizedSamplePropertyGroup) getGroup(child);
+            if (childGroup != null && childGroup.contains(propertyValue)) {
+                return assignGroup(childGroup, propertyValue);
+            }
+        }
+
+        return curGroup;
+    }
+
+    public void validate() {
+        for (SamplePropertyGroup<String> group : getGroups()) {
+            String curGroupID = group.getUniqueID();
+            Set<String> curGroupChildSet = _groupTree.get(curGroupID);
+            // if current group has no children, it's a leaf node group then.
+            if (curGroupID.equals("OTHER")) {
+                ((CategorizedSamplePropertyGroup) group).addValue(group.getUniqueID());
+                _addValuesToParents(group.getUniqueID());
+            }
+            if (curGroupChildSet == null || curGroupChildSet.isEmpty()) {
+                ((CategorizedSamplePropertyGroup) group).addValue(group.getUniqueID());
+                _addValuesToParents(group.getUniqueID());
+            }
+        }
+    }
+
+    private void _addValuesToParents(String childID) {
+        CategorizedSamplePropertyGroup curGroup = (CategorizedSamplePropertyGroup) getGroup(childID);
+        String parentID = curGroup.getParent();
+        CategorizedSamplePropertyGroup parentGroup = (CategorizedSamplePropertyGroup) getGroup(parentID);
+
+        while (parentGroup != null) {
+            parentGroup.addValue(childID);
+            parentGroup = (CategorizedSamplePropertyGroup) getGroup(parentGroup.getParent());
+        }
     }
 }

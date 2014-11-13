@@ -48,7 +48,7 @@ public class ImportPropertyIDGroupSettingFromOBOAction extends AbstractAction{
                 @Override
                 public void run() {
                     try {
-                        CategorizedPropertyGroupSetting newSetting  = CategorizedPropertyGroupSetting.importGroupSettingFromOBOFile(f.getName(), new FileInputStream(f));
+                        CategorizedPropertyGroupSetting newSetting  = CategorizedPropertyGroupSetting.importGroupSettingFromOBOFile(_curPropString, new FileInputStream(f));
                        
                         if (newSetting == null) {
                             return;

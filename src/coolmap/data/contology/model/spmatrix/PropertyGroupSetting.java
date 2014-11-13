@@ -13,7 +13,7 @@ import java.util.HashMap;
  *
  * @author Keqiang Li
  */
-public class PropertyGroupSetting {
+public abstract class PropertyGroupSetting <T> {
 
     private final String _propType;
     private final HashMap<String, SamplePropertyGroup> _groups;
@@ -53,4 +53,6 @@ public class PropertyGroupSetting {
     protected SamplePropertyGroup getGroup(String groupID) {
         return _groups.get(groupID);
     }
+    
+    public abstract SamplePropertyGroup assignGroup(SamplePropertyGroup curGroup, T propertyValue);
 }

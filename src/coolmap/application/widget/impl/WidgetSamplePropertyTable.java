@@ -185,7 +185,7 @@ public class WidgetSamplePropertyTable extends Widget {
                             final ArrayList<String> data = new ArrayList<>();
 
                             for (SamplePropertyGroup group : groups) {
-                                data.add(group.getCustomizedName());
+                                data.add(group.getDisplayName());
                             }
                       
 
