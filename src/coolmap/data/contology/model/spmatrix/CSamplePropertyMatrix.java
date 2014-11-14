@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * This data object should be maintained during users modifying the order of
@@ -77,7 +78,7 @@ public class CSamplePropertyMatrix {
         ArrayList<String> result = new ArrayList<>();
 
         for (SampleProperty property : _sampleNameToProperties.get(sampleName)) {
-            result.add(property.getDisplayName());
+            result.add("" + property.getValueAsString());
         }
         return result;
     }
@@ -176,11 +177,11 @@ public class CSamplePropertyMatrix {
     private PropertyGroupSetting _generateDefaultGroupForCategorizedProp(String propType) {
         CategorizedPropertyGroupSetting setting = new CategorizedPropertyGroupSetting(propType);
 
-        CategorizedSamplePropertyGroup topLevelGroup = new CategorizedSamplePropertyGroup(propType + " all properties", propType + " top level group");
+        CategorizedSamplePropertyGroup topLevelGroup = new CategorizedSamplePropertyGroup(propType + " top level group", propType + " all properties");
         setting.addGroup(topLevelGroup);
 
         for (String value : _propUniqValues.get(propType)) {
-            CategorizedSamplePropertyGroup tmpGroup = new CategorizedSamplePropertyGroup(value, value);
+            CategorizedSamplePropertyGroup tmpGroup = new CategorizedSamplePropertyGroup(propType + " " + value, value);
             tmpGroup.setParent(topLevelGroup.getUniqueID());
             tmpGroup.addValue(value);
             setting.addGroup(tmpGroup);
@@ -328,7 +329,7 @@ public class CSamplePropertyMatrix {
         _ontology = new COntology(ontologyName, "default ontology generated on properties");
 
         _depthFirstBuildOntology("Root", 0);
-        _mapSamplesToOntology();
+        //_mapSamplesToOntology();
 
         _ontology.validate();
 
@@ -343,12 +344,36 @@ public class CSamplePropertyMatrix {
             return;
         }
 
-        Collection<SamplePropertyGroup> curPropGroups = _propGroupInfo.get(_propOrder.get(curPropIndex)).getGroups();
-        for (SamplePropertyGroup group : curPropGroups) {
-            String curLevelLable = prefix + "-" + group.getDisplayName();
-            _ontology.addRelationshipNoUpdateDepth(prefix, curLevelLable);
+        String propName = _propOrder.get(curPropIndex);
+        if (isCategorizedProp(propName)) {
+            CategorizedPropertyGroupSetting groupSetting = (CategorizedPropertyGroupSetting)_propGroupInfo.get(propName);
+            String rootName = groupSetting.getRootName();
+            _recursiveGenerateCateGroupTreeInOntology(prefix, rootName, curPropIndex, groupSetting);
+            
+        } else {
+            Collection<SamplePropertyGroup> curPropGroups = _propGroupInfo.get(_propOrder.get(curPropIndex)).getGroups();
+            for (SamplePropertyGroup group : curPropGroups) {
+                String curLevelLable = prefix + "-" + group.getDisplayName();
+                _ontology.addRelationshipNoUpdateDepth(prefix, curLevelLable);
+                _depthFirstBuildOntology(curLevelLable, curPropIndex + 1);
+            }
+        }
+    }
+    
+    private void _recursiveGenerateCateGroupTreeInOntology(String prefix, String rootName, int curPropIndex, CategorizedPropertyGroupSetting setting) {
+        
+        String curLevelLable = prefix + "-" + setting.getGroup(rootName).getDisplayName();
+        _ontology.addRelationshipNoUpdateDepth(prefix, curLevelLable);
+        Set<String> children = setting.getChildren(rootName);
+        
+        if (children.isEmpty()) {
             _depthFirstBuildOntology(curLevelLable, curPropIndex + 1);
         }
+        
+        for (String child : children) {
+            _recursiveGenerateCateGroupTreeInOntology(curLevelLable, child, curPropIndex, setting);
+        }
+        
     }
 
     // as long as the ontology has been generated, samples can be mapped to

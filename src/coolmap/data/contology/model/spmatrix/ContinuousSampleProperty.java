@@ -14,4 +14,9 @@ public class ContinuousSampleProperty extends SampleProperty<Double> {
     public ContinuousSampleProperty(String propType, double value) {
         super(propType, value);
     }
+
+    @Override
+    public String getValueAsString() {
+        return "" + value;
+    }
 }

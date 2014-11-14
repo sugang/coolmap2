@@ -19,6 +19,7 @@ public class CategorizedPropertyGroupSetting extends PropertyGroupSetting<String
 
     // stores all the parent-children relations
     private final HashMultimap<String, String> _groupTree = HashMultimap.create();
+    private String _rootNodeUniqueID;
 
     public CategorizedPropertyGroupSetting(String propType) {
         super(propType);
@@ -27,6 +28,14 @@ public class CategorizedPropertyGroupSetting extends PropertyGroupSetting<String
     // add a branch starting from a parent to children
     public void addGroupBranch(String parentGroupID, String childGroupID) {
         _groupTree.put(parentGroupID, childGroupID);
+    }
+    
+    public String getRootName() {
+        return _rootNodeUniqueID;
+    }
+    
+    public Set<String> getChildren(String nodeName) {
+        return _groupTree.get(nodeName);
     }
 
     /**
@@ -107,6 +116,12 @@ public class CategorizedPropertyGroupSetting extends PropertyGroupSetting<String
                 _addValuesToParents(group.getUniqueID());
             }
         }
+        
+       CategorizedSamplePropertyGroup group = (CategorizedSamplePropertyGroup)getGroups().toArray()[0];
+       while (group.getParent() != null && !group.getParent().equals("")) {
+           group = (CategorizedSamplePropertyGroup)getGroup(group.getParent());
+       }
+       _rootNodeUniqueID = group.getUniqueID();
     }
 
     private void _addValuesToParents(String childID) {

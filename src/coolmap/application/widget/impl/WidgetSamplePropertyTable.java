@@ -197,7 +197,7 @@ public class WidgetSamplePropertyTable extends Widget {
                             dialog.setSize(d);
                             dialog.add(panel);
 
-                            JButton confirmButton = new JButton("Confirm");
+                            JButton confirmButton = new JButton("OK");
 
                             panel.add(confirmButton, BorderLayout.SOUTH);
 
@@ -207,6 +207,7 @@ public class WidgetSamplePropertyTable extends Widget {
                                 public void mouseClicked(MouseEvent e) {
                                     dialog.setVisible(false);
 
+                                    /*
                                     ArrayList<HashSet> newSettings = new ArrayList<>();
 
                                     for (int i = 0; i < data.size(); ++i) {
@@ -214,7 +215,7 @@ public class WidgetSamplePropertyTable extends Widget {
 
                                     }
 
-                                    //_dataMatrix.setCatePropGroup(col - 1, newSettings);
+                                    _dataMatrix.setCatePropGroup(col - 1, newSettings);*/
 
                                 }
 
@@ -399,7 +400,7 @@ public class WidgetSamplePropertyTable extends Widget {
 
     }
 
-    private DefaultTableModel _getOntologyAsTableModel(CSamplePropertyMatrix matrix) {
+    private DefaultTableModel _getSPMatrixAsTableModel(CSamplePropertyMatrix matrix) {
 
         ArrayList<String> tableHeaders = new ArrayList<>();
 
@@ -433,7 +434,7 @@ public class WidgetSamplePropertyTable extends Widget {
             @Override
             public void run() {
                 _dataMatrix = dataMatrix;
-                DefaultTableModel model = _getOntologyAsTableModel(dataMatrix);
+                DefaultTableModel model = _getSPMatrixAsTableModel(dataMatrix);
                 _dataTable.setModel(model);
 
                 DefaultRowSorter sorter = (DefaultRowSorter) _dataTable.getRowSorter();

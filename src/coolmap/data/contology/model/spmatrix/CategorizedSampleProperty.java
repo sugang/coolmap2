@@ -14,4 +14,10 @@ public class CategorizedSampleProperty extends SampleProperty<String> {
     public CategorizedSampleProperty(String propType, String value) {
         super(propType, value);
     }
+
+    @Override
+    public String getValueAsString() {
+        return value;
+    }
+    
 }

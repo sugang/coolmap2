@@ -12,6 +12,7 @@ import java.util.HashMap;
 /**
  *
  * @author Keqiang Li
+ * @param <T>
  */
 public abstract class PropertyGroupSetting <T> {
 

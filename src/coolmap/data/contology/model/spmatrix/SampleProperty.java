@@ -10,7 +10,7 @@ package coolmap.data.contology.model.spmatrix;
  * @author Keqiang Li
  * @param <T> which primitive type the property contains
  */
-public class SampleProperty<T> {
+public abstract class SampleProperty<T> {
 
     public String propType; // type of this property, such as the type of MALE is GENDER
     private SamplePropertyGroup<T> _group;
@@ -28,4 +28,6 @@ public class SampleProperty<T> {
     public String getDisplayName() {
         return _group.getDisplayName();
     }
+    
+    public abstract String getValueAsString();
 }
