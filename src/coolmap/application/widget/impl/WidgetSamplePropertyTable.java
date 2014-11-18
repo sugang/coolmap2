@@ -14,7 +14,6 @@ import coolmap.data.contology.model.spmatrix.CSamplePropertyMatrix;
 import coolmap.data.contology.model.spmatrix.CategorizedPropertyGroupSetting;
 import coolmap.data.contology.model.spmatrix.ContinuousPropertyGroupSetting;
 import coolmap.data.contology.model.spmatrix.PropertyGroupSetting;
-import coolmap.data.contology.model.spmatrix.SamplePropertyGroup;
 import coolmap.utils.graphics.UI;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -24,30 +23,31 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.tree.DefaultMutableTreeNode;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
 /**
- * This widget displays the imported sample property table and let users
- * group and sort properties
+ * This widget displays the imported sample property table and let users group
+ * and sort properties
  *
  * @author Keqiang Li
  */
@@ -83,11 +83,11 @@ public class WidgetSamplePropertyTable extends Widget {
                 if (!SwingUtilities.isRightMouseButton(headerClickEvent)) {
                     return;
                 }
-                
+
                 // get where the click happens
-                final Point pt = headerClickEvent.getPoint();
+                final Point positionClicked = headerClickEvent.getPoint();
                 //get on which column user has clicked
-                final int col = _dataTable.columnAtPoint(pt);
+                final int col = _dataTable.columnAtPoint(positionClicked);
 
                 // do nothing when user clicks on the first column's header
                 if (col <= 0) {
@@ -96,16 +96,16 @@ public class WidgetSamplePropertyTable extends Widget {
 
                 // pop up a menu for user to choose what action to perform
                 JPopupMenu tableHeaderPopupMenu = new JPopupMenu();
-                
+
                 boolean isCategorizedProp = _dataMatrix.isCategorizedProp(col - 1);
-                
+
                 if (isCategorizedProp) {
                     JMenuItem importIDGroupItem = new JMenuItem(new ImportPropertyIDGroupSettingFromOBOAction(_dataMatrix.getPropType(col - 1)));
                     importIDGroupItem.setText("Import Group Setting from OBO File (map properties to ids)");
                     tableHeaderPopupMenu.add(importIDGroupItem);
-                    
+
                     JMenuItem importNameGroupItem = new JMenuItem(new ImportPropertyNameGroupSettingFromOBOAction(_dataMatrix.getPropType(col - 1)));
-                    importNameGroupItem.setText("Import Group Setting from OBO File (map properties to names");
+                    importNameGroupItem.setText("Import Group Setting from OBO File (map properties to names)");
                     tableHeaderPopupMenu.add(importNameGroupItem);
                 } else {
                     JMenuItem importContGroupItem = new JMenuItem(new ImportContinuousPropertyGroupFromFileAction(_dataMatrix.getPropType(col - 1)));
@@ -120,7 +120,7 @@ public class WidgetSamplePropertyTable extends Widget {
                 } else {
                     tableHeaderPopupMenu.add(editGroupItem);
                 }
-                
+
                 viewGroupitem.addActionListener(new ActionListener() {
 
                     @Override
@@ -128,7 +128,7 @@ public class WidgetSamplePropertyTable extends Widget {
                         // create a dialog to let user set group info
                         final JDialog dialog = new JDialog(CoolMapMaster.getCMainFrame(), "Viewing Groups");
 
-                        dialog.setLocation(pt);
+                        dialog.setLocation(positionClicked);
                         dialog.setLayout(new BorderLayout());
 
                         PropertyGroupSetting originalSetting = _dataMatrix.getGroupSettingForProperty(col - 1);
@@ -136,92 +136,32 @@ public class WidgetSamplePropertyTable extends Widget {
                         if (originalSetting == null) {
                             return;
                         }
-                        
+
                         CategorizedPropertyGroupSetting setting = (CategorizedPropertyGroupSetting) originalSetting;
-                            Collection<SamplePropertyGroup> groups = setting.getGroups();
 
-                            final ArrayList<String> data = new ArrayList<>();
+                        DefaultMutableTreeNode top = createGroupTree(setting, setting.getRootName());
+                        JTree tree = new JTree(top);
+                        
+                        JScrollPane treeView = new JScrollPane(tree);
 
-                            for (SamplePropertyGroup group : groups) {
-                                data.add(group.toString());
+                        Dimension d = new Dimension(300, 200);
+                        dialog.setSize(d);
+
+                        JButton confirmButton = new JButton("OK");
+
+                        dialog.add(confirmButton, BorderLayout.SOUTH);
+
+                        confirmButton.addMouseListener(new MouseAdapter() {
+
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                dialog.setVisible(false);
                             }
-                      
 
-                            final JList list = new JList(data.toArray());
+                        });
 
-                            list.addMouseListener(new MouseAdapter() {
-
-                                @Override
-                                public void mouseClicked(MouseEvent e) {
-
-                                    final int index = list.getSelectedIndex();
-                                    if (e.getClickCount() != 2) {
-                                        return;
-                                    }
-
-                                    final JDialog editDialog = new JDialog(dialog, "Modifying Group");
-                                    final JTextField editGroup = new JTextField(data.get(index));
-
-                                    editDialog.setLayout(new BorderLayout());
-                                    editDialog.add(editGroup, BorderLayout.NORTH);
-
-                                    editDialog.setLocation(e.getPoint());
-                                    editDialog.setSize(200, 100);
-                                    editDialog.setVisible(true);
-
-                                    JButton confirmEditButton = new JButton("Change");
-                                    editDialog.add(confirmEditButton, BorderLayout.SOUTH);
-
-                                    confirmEditButton.addMouseListener(new MouseAdapter() {
-
-                                        @Override
-                                        public void mouseClicked(MouseEvent e) {
-                                            editDialog.setVisible(false);
-                                            String changedString = editGroup.getText();
-                                            ArrayList<String> newData = _generateNewData(data, index, changedString);
-
-                                            data.clear();
-                                            data.addAll(newData);
-                                            list.setListData(data.toArray());
-                                        }
-                                    });
-                                }
-
-                            });
-
-                            JPanel panel = new JPanel(new BorderLayout());
-                            JScrollPane scrollPane1 = new JScrollPane(list);
-
-                            panel.add(scrollPane1, BorderLayout.NORTH);
-                            Dimension d = new Dimension(300, 200);
-                            dialog.setSize(d);
-                            dialog.add(panel);
-
-                            JButton confirmButton = new JButton("OK");
-
-                            panel.add(confirmButton, BorderLayout.SOUTH);
-
-                            confirmButton.addMouseListener(new MouseAdapter() {
-
-                                @Override
-                                public void mouseClicked(MouseEvent e) {
-                                    dialog.setVisible(false);
-
-                                    /*
-                                    ArrayList<HashSet> newSettings = new ArrayList<>();
-
-                                    for (int i = 0; i < data.size(); ++i) {
-                                        newSettings.add(_convertStringToHashSet(data.get(i)));
-
-                                    }
-
-                                    _dataMatrix.setCatePropGroup(col - 1, newSettings);*/
-
-                                }
-
-                            });
-                            
-                            dialog.setVisible(true);
+                        dialog.add(treeView, BorderLayout.NORTH);
+                        dialog.setVisible(true);
                     }
                 });
 
@@ -234,7 +174,7 @@ public class WidgetSamplePropertyTable extends Widget {
                         // create a dialog to let user set group info
                         final JDialog dialog = new JDialog(CoolMapMaster.getCMainFrame(), "Customize Groups");
 
-                        dialog.setLocation(pt);
+                        dialog.setLocation(positionClicked);
                         dialog.setLayout(new BorderLayout());
 
                         PropertyGroupSetting originalSetting = _dataMatrix.getGroupSettingForProperty(col - 1);
@@ -274,10 +214,14 @@ public class WidgetSamplePropertyTable extends Widget {
                                     String[] interResult = changedString.split(",");
                                     for (int i = 0; i < interResult.length; ++i) {
                                         interResult[i] = interResult[i].trim();
+                                        if (interResult[i].equals("")) {
+                                            continue;
+                                        }
                                         try {
                                             Double curValue = Double.parseDouble(interResult[i]);
                                             newGroupList.add(curValue);
                                         } catch (NumberFormatException ex) {
+                                            return;  // contains invalid input.
                                         }
                                     }
 
@@ -288,8 +232,8 @@ public class WidgetSamplePropertyTable extends Widget {
                                 }
                             });
 
-                        } 
-                        
+                        }
+
                         dialog.setVisible(true);
                     }
                 });
@@ -311,38 +255,17 @@ public class WidgetSamplePropertyTable extends Widget {
         });
 
     }
-
-    private ArrayList<String> _generateNewData(ArrayList<String> data, int index, String changedString) {
-        String originalString = data.get(index);
-        HashSet<String> originalGroup = _convertStringToHashSet(originalString);
-
-        HashSet<String> changedGroup = _convertStringToHashSet(changedString);
-        if (originalGroup.equals(changedGroup)) {
-            return data;
+    
+    private DefaultMutableTreeNode createGroupTree(CategorizedPropertyGroupSetting setting, String rootName) {     
+        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(setting.getGroup(rootName).getDisplayName());
+        Set<String> childrenNodes = setting.getChildren(rootName);
+        
+        for (String childNode : childrenNodes) {
+            DefaultMutableTreeNode newNode = createGroupTree(setting, childNode);
+            rootNode.add(newNode);
         }
-
-        ArrayList<String> newDataList = new ArrayList<>();
-        for (int i = 0; i < data.size(); ++i) {
-            if (i != index) {
-                HashSet<String> curGroup = _convertStringToHashSet(data.get(i));
-                curGroup.removeAll(changedGroup);
-                if (curGroup.size() > 0) {
-                    newDataList.add(curGroup.toString());
-                }
-            } else {
-                if (changedGroup.size() > 0) {
-                    newDataList.add(changedGroup.toString());
-                }
-            }
-        }
-
-        originalGroup.removeAll(changedGroup);
-        if (originalGroup.size() > 0) {
-            newDataList.add(originalGroup.toString());
-        }
-
-        return newDataList;
-
+        
+        return rootNode;
     }
 
     private HashSet<String> _convertStringToHashSet(String str) {

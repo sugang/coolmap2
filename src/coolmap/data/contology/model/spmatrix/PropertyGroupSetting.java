@@ -51,7 +51,7 @@ public abstract class PropertyGroupSetting <T> {
         return _groups.values();
     }
     
-    protected SamplePropertyGroup getGroup(String groupID) {
+    public SamplePropertyGroup getGroup(String groupID) {
         return _groups.get(groupID);
     }
     
