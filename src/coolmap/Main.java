@@ -1,7 +1,6 @@
 package coolmap;
 
 import coolmap.application.CoolMapMaster;
-import coolmap.application.io.external.ImportCOntologyFromGMT;
 import coolmap.application.io.external.ImportCOntologyFromSimpleTwoColumn;
 import coolmap.application.io.external.ImportDoubleCMatrixFromFile;
 import coolmap.application.widget.impl.console.CMConsole;
@@ -20,7 +19,6 @@ import coolmap.data.contology.model.COntology;
 import coolmap.data.snippet.DoubleSnippet1_3;
 import coolmap.data.snippet.SnippetMaster;
 import coolmap.utils.Config;
-import coolmap.utils.graphics.UI;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -91,8 +89,8 @@ public class Main {
 
     private static void loadSampleCoolMapProject() {
         try {
-            CoolMapObject object;
-            COntology onto;
+            //CoolMapObject object;
+            //COntology onto;
             //CMatrix matrix = ImportDoubleCMatrixFromFile.importFromFile(new File("/Users/sugang/Dropbox/Research - Dropbox/CoolMap datasets/0TestData.txt"));
 //            CoolMapObject object = importer.importFromFile(new File("/Users/gangsu/0correlation.txt"));
             //import sample
@@ -105,24 +103,24 @@ public class Main {
             CMatrix matrix = ImportDoubleCMatrixFromFile.importFromFile(new File(corFilePath));
 //            System.out.println(matrix + " " + matrix.getNumRows() + " " + matrix.getNumColumns() + " " + matrix.getValue(0, 0));
 
-            object = new CoolMapObject();
+            CoolMapObject object = new CoolMapObject();
             object.addBaseCMatrix(matrix);
 
-            CMatrix matrix2 = ImportDoubleCMatrixFromFile.importFromFile(new File(corFilePath));
+//            CMatrix matrix2 = ImportDoubleCMatrixFromFile.importFromFile(new File(corFilePath));
 //            object.addBaseCMatrix(matrix2);
 
 //            Add base nodes ===================================================
-            ArrayList<VNode> nodes = new ArrayList<VNode>();
-            for (Object label : matrix.getRowLabelsAsList()) {
-                nodes.add(new VNode(label.toString()));
-            }
-//            object.insertRowNodes(nodes);
-
-            nodes.clear();
-            for (Object label : matrix.getColLabelsAsList()) {
-                nodes.add(new VNode(label.toString()));
-            }
-//            object.insertColumnNodes(nodes);
+//            ArrayList<VNode> nodes = new ArrayList<>();
+//            for (Object label : matrix.getRowLabelsAsList()) {
+//                nodes.add(new VNode(label.toString()));
+//            }
+////            object.insertRowNodes(nodes);
+//
+//            nodes.clear();
+//            for (Object label : matrix.getColLabelsAsList()) {
+//                nodes.add(new VNode(label.toString()));
+//            }
+////            object.insertColumnNodes(nodes);
 
             //need ontology nodes
 ////////////////////////////////////////////////////////////////////////////////
@@ -148,17 +146,17 @@ public class Main {
 //
 //            object.insertColumnNodes(nodes);
             //There are two more nodes here
-            COntology.setAttribute("Node1", "Name", "Attr1");
-            COntology.setAttribute("Node2", "Weight", "Attr2");
+            //COntology.setAttribute("Node1", "Name", "Attr1");
+            //COntology.setAttribute("Node2", "Weight", "Attr2");
 
 //            for(int i=0; i<100; i++){
 //                COntology.setAttribute("Node2", "Weight"+i, "Attr");
 //            }
-            onto = ImportCOntologyFromSimpleTwoColumn.importFromFile(new File(chiParFilePath));
+            COntology onto = ImportCOntologyFromSimpleTwoColumn.importFromFile(new File(chiParFilePath));
             CoolMapMaster.addNewCOntology(onto);
 
-            onto = ImportCOntologyFromSimpleTwoColumn.importFromFile(new File(chiParFileCopyPath));
-            CoolMapMaster.addNewCOntology(onto);
+//            onto = ImportCOntologyFromSimpleTwoColumn.importFromFile(new File(chiParFileCopyPath));
+//            CoolMapMaster.addNewCOntology(onto);
 
             object.insertRowNodes(onto.getRootNodesOrdered());
             object.insertColumnNodes(onto.getRootNodesOrdered());

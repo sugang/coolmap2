@@ -58,22 +58,22 @@ public final class CoolMapObject<BASE, VIEW> {
     private String _name = "Untitled";
     //Basic instance
     //can contain many matrices
-    private ArrayList<CMatrix<BASE>> _cMatrices = new ArrayList<CMatrix<BASE>>();
+    private ArrayList<CMatrix<BASE>> _cMatrices = new ArrayList<>();
     //vMatrix carries all the other info
     private final VMatrix<BASE, VIEW> _vMatrix = new VMatrix<>();
-    ;
+
     //Aggregator
     private CAggregator<BASE, VIEW> _cAggregator = null;
     //cache
-    protected TableCache<VIEW> _cache = new TableCache<VIEW>();
+    protected TableCache<VIEW> _cache = new TableCache<>();
     //filter
     //protected Filter<VIEW> _viewFilter = null;
     //view renderer
     protected ViewRenderer<VIEW> _viewRenderer = null;
     //annotation renderer
     protected SnippetConverter<VIEW> _snippetConverter = null;
-    private final HashSet<CObjectListener> _coolMapDataListeners = new HashSet<CObjectListener>();
-    private final HashSet<CObjectStateStoreListener> _cObjectStateRestoreListeners = new HashSet<CObjectStateStoreListener>();
+    private final HashSet<CObjectListener> _coolMapDataListeners = new HashSet<>();
+    private final HashSet<CObjectStateStoreListener> _cObjectStateRestoreListeners = new HashSet<>();
 
 //    private StateStorage _stateStorage;
     private final CombinationFilter _masterFilter;
@@ -288,17 +288,13 @@ public final class CoolMapObject<BASE, VIEW> {
 //    public void zoomOut(boolean zoomX, boolean zoomY) {
 //        _canvas.zoomOut(zoomX, zoomY);
 //    }
-    private final CoolMapView<BASE, VIEW> _coolMapView = new CoolMapView<BASE, VIEW>(this);
+    private final CoolMapView<BASE, VIEW> _coolMapView = new CoolMapView<>(this);
 
 //    public JComponent getCanvas() {
 //        return _canvas.getRenderCanvas();
 //    }
     public boolean isViewMatrixValid() {
-        if (getViewNumColumns() > 0 && getViewNumRows() > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return getViewNumColumns() > 0 && getViewNumRows() > 0;
     }
 
     public boolean isCellSelected(int row, int col) {
@@ -363,7 +359,7 @@ public final class CoolMapObject<BASE, VIEW> {
 //        _annotationRenderer = annotationRenderer;
 //    }
     /**
-     * get view value, attempt to retreive from cache used for generate tooltips
+     * get view value, attempt to retrieve from cache used for generate tooltips
      *
      * @param row
      * @param column
@@ -454,7 +450,7 @@ public final class CoolMapObject<BASE, VIEW> {
             return;
         }
 
-        HashSet<VNode> nodesToBeRemoved = new HashSet<VNode>(nodes.size());
+        HashSet<VNode> nodesToBeRemoved = new HashSet<>(nodes.size());
         for (VNode node : nodes) {
             if (node != null && node.getParentNode() == null) {
                 nodesToBeRemoved.add(node);
@@ -482,7 +478,7 @@ public final class CoolMapObject<BASE, VIEW> {
 
 //        System.out.println(System.currentTimeMillis());
 
-        HashSet<VNode> nodesToBeRemoved = new HashSet<VNode>(nodes.size());
+        HashSet<VNode> nodesToBeRemoved = new HashSet<>(nodes.size());
         for (VNode node : nodes) {
             if (node != null && node.getParentNode() == null) {
                 nodesToBeRemoved.add(node);
@@ -553,7 +549,7 @@ public final class CoolMapObject<BASE, VIEW> {
     }
 
     /**
-     * This method is only used to remove nodes, but the treenodes are kept
+     * This method is only used to remove nodes, but the tree nodes are kept
      *
      * @param nodes
      */
@@ -612,7 +608,7 @@ public final class CoolMapObject<BASE, VIEW> {
         if (select) {
             Rectangle sel = new Rectangle(index, 0, nodes.size(), getViewNumRows());
             _coolMapView.setSelection(sel);
-            HashSet<Rectangle> nodeRegion = new HashSet<Rectangle>();
+            HashSet<Rectangle> nodeRegion = new HashSet<>();
             nodeRegion.add(sel);
             _coolMapView.highlightNodeRegions(nodeRegion);
         }
@@ -657,7 +653,7 @@ public final class CoolMapObject<BASE, VIEW> {
         }
 
         //Object[][][] baseMatrix = (BASE[][][]) (Array.newInstance(baseClass, _cMatrices.size(), rowBaseIndices.length, colBaseIndices.length));
-        ArrayList<Object[][]> baseMatrixList = new ArrayList<Object[][]>(_cMatrices.size());
+        ArrayList<Object[][]> baseMatrixList = new ArrayList<>(_cMatrices.size());
         Integer rowIndex;
         Integer colIndex;
         for (int mi = 0; mi < _cMatrices.size(); mi++) {
@@ -994,7 +990,7 @@ public final class CoolMapObject<BASE, VIEW> {
             int newIndex = firstNode.getViewIndex().intValue();
             selectedColumns.add(Range.closedOpen(newIndex, newIndex + width));
 
-            ArrayList<Rectangle> newSelections = new ArrayList<Rectangle>();
+            ArrayList<Rectangle> newSelections = new ArrayList<>();
             for (Range<Integer> colRange : selectedColumns) {
                 for (Range<Integer> rowRange : selectedRows) {
                     newSelections.add(new Rectangle(colRange.lowerEndpoint(), rowRange.lowerEndpoint(), colRange.upperEndpoint() - colRange.lowerEndpoint(), rowRange.upperEndpoint() - rowRange.lowerEndpoint()));
@@ -1095,7 +1091,7 @@ public final class CoolMapObject<BASE, VIEW> {
             selectedRows.add(Range.closedOpen(newIndex, newIndex + height));
 
 //            System.out.println("First node index:" + firstNode + " " + newIndex);
-            ArrayList<Rectangle> newSelections = new ArrayList<Rectangle>();
+            ArrayList<Rectangle> newSelections = new ArrayList<>();
             for (Range<Integer> colRange : selectedColumns) {
                 for (Range<Integer> rowRange : selectedRows) {
                     newSelections.add(new Rectangle(colRange.lowerEndpoint(), rowRange.lowerEndpoint(), colRange.upperEndpoint() - colRange.lowerEndpoint(), rowRange.upperEndpoint() - rowRange.lowerEndpoint()));
@@ -1246,14 +1242,14 @@ public final class CoolMapObject<BASE, VIEW> {
 
             if (select) {
                 //reselect the child nodes of these nodes
-                ArrayList<VNode> retainedNodes = new ArrayList<VNode>();
+                ArrayList<VNode> retainedNodes = new ArrayList<>();
                 for (VNode node : nodes) {
                     if (node != null && node.isGroupNode() && node.isExpanded()) {
                         retainedNodes.add(node);
                     }
                 }
                 List<VNode> toBeSelectedNodes = getViewNodesColumnFromTreeNodes(retainedNodes);
-                ArrayList<Integer> retainedIndices = new ArrayList<Integer>();
+                ArrayList<Integer> retainedIndices = new ArrayList<>();
                 for (VNode node : toBeSelectedNodes) {
                     if (node != null && node.getViewIndex() != null) {
                         try {
@@ -1293,14 +1289,14 @@ public final class CoolMapObject<BASE, VIEW> {
             getCoolMapView().updateCanvasEnforceAll();
 
             if (select) {
-                ArrayList<VNode> retainedNodes = new ArrayList<VNode>();
+                ArrayList<VNode> retainedNodes = new ArrayList<>();
                 for (VNode node : nodes) {
                     if (node != null && node.isGroupNode() && node.isExpanded()) {
                         retainedNodes.add(node);
                     }
                 }
                 List<VNode> toBeSelectedNodes = getViewNodesRowFromTreeNodes(retainedNodes);
-                ArrayList<Integer> retainedIndices = new ArrayList<Integer>();
+                ArrayList<Integer> retainedIndices = new ArrayList<>();
                 for (VNode node : toBeSelectedNodes) {
                     if (node != null && node.getViewIndex() != null) {
                         try {
@@ -1408,7 +1404,7 @@ public final class CoolMapObject<BASE, VIEW> {
 
         if (select) {
 
-            ArrayList<Integer> retainedIndices = new ArrayList<Integer>();
+            ArrayList<Integer> retainedIndices = new ArrayList<>();
 
             for (VNode node : nodes) {
                 if (node != null && node.getViewIndex() != null && node.isGroupNode()) {
@@ -1447,7 +1443,7 @@ public final class CoolMapObject<BASE, VIEW> {
         notifyRowsChanged();
 
         if (select) {
-            ArrayList<Integer> retainedIndices = new ArrayList<Integer>();
+            ArrayList<Integer> retainedIndices = new ArrayList<>();
 
             for (VNode node : nodes) {
                 if (node != null && node.getViewIndex() != null && node.isGroupNode()) {
@@ -1485,7 +1481,7 @@ public final class CoolMapObject<BASE, VIEW> {
 //        StateSnapshot snapshot = new StateSnapshot(this, COntology.COLUMN, StateSnapshot.COLUMNCOLLAPSE);
 //        notifyStateStorageUpdated();
 //        find the first level parents
-        HashSet<VNode> levelOneParents = new HashSet<VNode>();
+        HashSet<VNode> levelOneParents = new HashSet<>();
         for (VNode node : getViewNodesColumn()) {
             if (node.getParentNode() != null) {
                 levelOneParents.add(node.getParentNode());
@@ -1495,7 +1491,7 @@ public final class CoolMapObject<BASE, VIEW> {
 //        System.out.println("Level one parents:" + levelOneParents);
 
 //        must check to ensure that all level one parents children are also level one
-        HashSet<VNode> onlyLevelOneParents = new HashSet<VNode>();
+        HashSet<VNode> onlyLevelOneParents = new HashSet<>();
         for (VNode node : levelOneParents) {
             if (!node.isGroupNode()) {
                 continue;
@@ -1529,7 +1525,7 @@ public final class CoolMapObject<BASE, VIEW> {
 //        StateSnapshot snapshot = new StateSnapshot(this, COntology.ROW, StateSnapshot.ROWCOLLAPSE);
 //        notifyStateStorageUpdated();
 //        find the first level parents
-        HashSet<VNode> levelOneParents = new HashSet<VNode>();
+        HashSet<VNode> levelOneParents = new HashSet<>();
         for (VNode node : getViewNodesRow()) {
             if (node.getParentNode() != null) {
                 levelOneParents.add(node.getParentNode());
@@ -1539,7 +1535,7 @@ public final class CoolMapObject<BASE, VIEW> {
 //        System.out.println("Level one parents:" + levelOneParents);
 
 //        must check to ensure that all level one parents children are also level one
-        HashSet<VNode> onlyLevelOneParents = new HashSet<VNode>();
+        HashSet<VNode> onlyLevelOneParents = new HashSet<>();
         for (VNode node : levelOneParents) {
             if (!node.isGroupNode()) {
                 continue;
@@ -1944,7 +1940,7 @@ public final class CoolMapObject<BASE, VIEW> {
         CoolMapMaster.addNewBaseMatrix(mx1);
         CoolMapMaster.addNewBaseMatrix(mx2);
 
-        CoolMapObject<Double, Double> coolMapObject = new CoolMapObject<Double, Double>();
+        CoolMapObject<Double, Double> coolMapObject = new CoolMapObject<>();
 
         DoubleDoubleMax maxAggr = new DoubleDoubleMax();
         coolMapObject.setAggregator(maxAggr);
@@ -1964,8 +1960,8 @@ public final class CoolMapObject<BASE, VIEW> {
         List<String> rowLabels = mx.getRowLabelsAsList();
         List<String> colLabels = mx.getColLabelsAsList();
 
-        ArrayList<VNode> rowNodes = new ArrayList<VNode>();
-        ArrayList<VNode> colNodes = new ArrayList<VNode>();
+        ArrayList<VNode> rowNodes = new ArrayList<>();
+        ArrayList<VNode> colNodes = new ArrayList<>();
 
         for (String r : rowLabels) {
             rowNodes.add(new VNode(r));
