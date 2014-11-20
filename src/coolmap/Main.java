@@ -239,7 +239,7 @@ public class Main {
                     object = new CoolMapObject();
                     object.addBaseCMatrix(matrix);
 
-                    ArrayList<VNode> nodes = new ArrayList<VNode>();
+                    ArrayList<VNode> nodes = new ArrayList<>();
                     for (Object label : matrix.getRowLabelsAsList()) {
                         nodes.add(new VNode(label.toString()));
                     }

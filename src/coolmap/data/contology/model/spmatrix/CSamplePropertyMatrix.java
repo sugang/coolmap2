@@ -329,7 +329,7 @@ public class CSamplePropertyMatrix {
         _ontology = new COntology(ontologyName, "default ontology generated on properties");
 
         _depthFirstBuildOntology("Root", 0);
-        //_mapSamplesToOntology();
+        _mapSamplesToOntology();
 
         _ontology.validate();
 
@@ -380,21 +380,43 @@ public class CSamplePropertyMatrix {
     // leaf nodes
     private void _mapSamplesToOntology() {
         for (String sampleName : _sampleNames) {
-            String prefix = "Root";
             ArrayList<SampleProperty> properties = _sampleNameToProperties.get(sampleName);
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("Root");
+            
             for (SampleProperty property : properties) {
-                //String propType = property.propType;
-                //if (isCategorizedProp(propType)) {
-                    
-               // } else {
-                    prefix = prefix + "-" + property.getDisplayName();
-                    
-             //   }
+                String curPropertyPrefix = _generateSamplePathPrefix(property);
+                sb.append("-").append(curPropertyPrefix);
             }
-            
-            _ontology.addRelationshipNoUpdateDepth(prefix, prefix + "-" + sampleName);
-            
+
+            _ontology.addRelationshipNoUpdateDepth(sb.toString(), sampleName);
         }
+    }
+    
+    private String _generateSamplePathPrefix(SampleProperty property) {
+        String propType = property.propType;
+        if (isCategorizedProp(propType)) {
+            CategorizedSampleProperty cateProp = (CategorizedSampleProperty)property;
+            CategorizedSamplePropertyGroup assignedGroup = (CategorizedSamplePropertyGroup)cateProp.getGroup();
+            CategorizedPropertyGroupSetting setting = (CategorizedPropertyGroupSetting)_propGroupInfo.get(propType);
+            
+            return _generateParentPath(assignedGroup, setting);
+
+        } else {
+            return property.getDisplayName();
+        }
+    }
+    
+    private String _generateParentPath(CategorizedSamplePropertyGroup group, CategorizedPropertyGroupSetting setting) {
+        String parent = group.getParent();
+        
+        if (parent == null || parent.isEmpty()) {
+            return group.getDisplayName();
+        }
+        
+        CategorizedSamplePropertyGroup parentGroup = (CategorizedSamplePropertyGroup)setting.getGroup(group.getParent());
+        return _generateParentPath(parentGroup, setting) + "-" + group.getDisplayName();     
     }
 
     private void _updateGroup(String propType) {

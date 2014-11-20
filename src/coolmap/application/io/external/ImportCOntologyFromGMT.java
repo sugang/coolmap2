@@ -7,12 +7,10 @@
 package coolmap.application.io.external;
 
 import coolmap.data.contology.model.COntology;
-import coolmap.data.contology.utils.COntologyUtils;
 import coolmap.utils.Tools;
 import coolmap.utils.bioparser.gseagmt.GmtEntry;
 import java.io.File;
 import java.io.FileInputStream;
-import static java.lang.System.in;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;

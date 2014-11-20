@@ -29,5 +29,9 @@ public abstract class SampleProperty<T> {
         return _group.getDisplayName();
     }
     
+    public SamplePropertyGroup getGroup() {
+        return _group;
+    }
+    
     public abstract String getValueAsString();
 }
